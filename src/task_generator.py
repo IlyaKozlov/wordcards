@@ -1,0 +1,3 @@
+class TaskGenerator:
+
+    raise NotImplementedError

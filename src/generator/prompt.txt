@@ -1,0 +1,125 @@
+You are an english native speaker, who also knows russian.
+
+I want to get a translation and explanation for a word 'WORD'
+
+Please give me
+1 An explanation of this word, if the word has different meanings answer with each of them.
+2 Give 3 examples of the word in a sentence, mark the word with _ in the beginning and in the end.
+3 Give a translation for a word
+
+
+Answer with the list of json:
+
+[
+    {
+    "meaning": the word,
+    "explanation": the explanation,
+    "sentences":[sentence1, sentence2, sentence3]
+    }
+]
+
+
+Example 1:
+Input:
+    Sheep
+Output:
+```json
+[
+  {
+    "meaning": "Literal meaning",
+    "explanation": "A sheep is a domesticated mammal (*Ovis aries*) raised for its wool, meat (mutton or lamb), and milk. They are known for their docile nature and flocking behavior. ",
+    "sentences": [
+      "_Sheep_ is eating the grass in the meadow.",
+      "These _sheep_ are well-known by it thin whool.",
+      "The farmer sheared the _sheep_ to collect wool for winter clothing."
+    ],
+    "translation": "овца"
+  }
+]
+```
+
+Example 2:
+
+Input
+    Goose
+
+Output
+```json
+[
+  {
+    "meaning": "Literal meaning",
+    "explanation": "A goose is a large waterfowl (*Anatidae* family) with a long neck, webbed feet, and a loud honking call. Geese are known for their migratory habits and are often domesticated for meat, eggs, and feathers.",
+    "sentences": [
+      "The _goose_ waddled across the yard, honking loudly.",
+      "We saw a flock of wild _geese_ flying south for the winter.",
+      "She roasted a _goose_ for the holiday dinner."
+    ],
+    "translation": "гусь"
+  },
+  {
+    "meaning": "Slang meaning",
+    "explanation": "In slang, 'goose' can mean to poke or prod someone playfully, often in a teasing or mischievous way. It can also refer to a silly or foolish person.",
+    "sentences": [
+      "He _goosed_ his friend to make him jump.",
+      "Don't be such a _goose_—think before you act!",
+      "She _goosed_ him in the ribs to get his attention."
+    ],
+    "translation": "дразнить, подшучивать (as a verb); глупец, простофиля (as a noun)"
+  },
+  {
+    "meaning": "Mechanical term",
+    "explanation": "In mechanics, 'goose' can refer to a type of flexible coupling or a device used to control airflow, such as a 'gooseneck' pipe or lamp.",
+    "sentences": [
+      "The mechanic adjusted the _gooseneck_ on the exhaust pipe.",
+      "She bent the _gooseneck_ lamp to direct the light onto her book.",
+      "The _goose_ coupling allows for movement between the two pipes."
+    ],
+    "translation": "гусиная шея (gooseneck), гибкое соединение"
+  }
+]
+```
+Example 3
+
+Input
+    Tank
+
+Output:
+```json
+[
+  {
+    "meaning": "Literal meaning",
+    "explanation": "A _tank_ is a large, heavily armored military vehicle equipped with weapons, such as a cannon and machine guns, used in ground combat.",
+    "sentences": [
+      "The army deployed several _tanks_ during the battle.",
+      "The _tank_ rolled over the rough terrain with ease.",
+      "He served as a commander in a _tank_ unit during the war."
+    ],
+    "translation": "танк"
+  },
+  {
+    "meaning": "Container",
+    "explanation": "A _tank_ is a large container for holding liquids or gases, such as water, fuel, or chemicals.",
+    "sentences": [
+      "The fish in the aquarium swam around the _tank_ happily.",
+      "We need to refill the car's fuel _tank_ before the trip.",
+      "The factory stores hazardous chemicals in a sealed _tank_."
+    ],
+    "translation": "бак, резервуар"
+  },
+  {
+    "meaning": "Slang (to fail or perform poorly)",
+    "explanation": "In informal usage, to _tank_ means to fail or perform very poorly, often in sports, business, or other competitive contexts.",
+    "sentences": [
+      "The company's stock price _tanked_ after the scandal was revealed.",
+      "The team _tanked_ the last game, losing by 30 points.",
+      "His career _tanked_ after the controversial interview."
+    ],
+    "translation": "провалиться, провалить (перфоманс)"
+  }
+]
+```
+
+Input
+'WORD'
+
+Output:

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Variant Selector</title>
+    <style>
+        .variant {
+            cursor: pointer;
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: inline-block;
+        }
+        .variant:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="translationContainer"></div>
+    <div id="variantsContainer"></div>
+
+    <script>
+        // Example JSON response from the backend
+        const responseJson = JSON_TASK;
+
+        // Function to display translation and variants
+        function displayTranslationAndVariants(data) {
+            const translationContainer = document.getElementById('translationContainer');
+            const variantsContainer = document.getElementById('variantsContainer');
+
+            // Display the translation
+            translationContainer.innerHTML = `<h2>${data.translation}</h2>`;
+
+            // Display each word variant
+            for (let i = 1; i <= 4; i++) {
+                const word = data[`word${i}`];
+                const variantDiv = document.createElement('div');
+                variantDiv.className = 'variant';
+                variantDiv.textContent = word;
+
+                // Add click event listener to each variant
+                variantDiv.addEventListener('click', () => {
+                    sendChosenVariant(data.uid, `word${i}`);
+                });
+
+                variantsContainer.appendChild(variantDiv);
+            }
+        }
+
+        // Function to send chosen variant to the backend
+        function sendChosenVariant(uid, chosen) {
+            fetch('/answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ uuid: uid, chosen: chosen }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // You can add more logic here after a successful response, like showing a message to the user
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Handle error
+            });
+        }
+
+        // Call the function to display the translation and variants
+        displayTranslationAndVariants(responseJson);
+    </script>
+</body>
+</html>
