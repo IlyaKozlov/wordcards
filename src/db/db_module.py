@@ -1,25 +1,15 @@
-import sqlite3
-import uuid
 import datetime
+import uuid
+
+from db.db_abc import Database
 
 
-class TaskDatabase:
-    def __init__(self, db_name: str = "tasks.db"):
-        self.db_name = db_name
-        self.connection = None
-        self.cursor = None
+class TaskDatabase(Database):
 
-    def __enter__(self):
-        self.connection = sqlite3.connect(self.db_name)
-        self.cursor = self.connection.cursor()
-        self._create_table()
-        return self
+    def __init__(self):
+        super().__init__(db_name="taskdb")
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.connection.commit()  # Commit any changes
-        self.connection.close()    # Close the connection
-
-    def _create_table(self):
+    def _create_tables(self):
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS Tasks (

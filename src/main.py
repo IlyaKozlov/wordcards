@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from logging import getLogger
 
-from db_module import TaskDatabase
+from db.db_module import TaskDatabase
 
 
 logger = getLogger(__name__)

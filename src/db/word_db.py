@@ -4,17 +4,25 @@ import time
 from pathlib import Path
 from typing import List
 
+from db.db_abc import Database
 from schemas.word import Word
 
 
-class WordDB:
+class WordDB(Database):
 
     def __init__(self):
-        self.path = Path(os.getenv("HOME")) / ".wordcards" / "words.json"
-        if not self.path.exists():
-            os.makedirs(self.path.parent, exist_ok=True)
-            with open(self.path, "w") as f:
-                json.dump([], f)
+        super().__init__(db_name="wordsdb")
+
+    def _create_tables(self):
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS Tasks (
+                uid TEXT PRIMARY KEY,
+                answer TEXT,
+                timestamp DATETIME
+            )
+            """
+        )
 
     def words(self) -> List[Word]:
         with open(self.path, "r") as f:
