@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Uncover</title>
+    <script>
+        async function fetchNewWord() {
+            const response = await fetch('/uncover/show_new_word');
+            const wordData = await response.json();
+            if (wordData.word) {
+                document.getElementById('word').innerText = wordData.word;
+                document.getElementById('explanation').innerText = wordData.explanation;
+            } else {
+                document.getElementById('word').innerText = "No new words";
+                document.getElementById('explanation').innerText = "";
+            }
+        }
+
+        async function uncoverWord() {
+            const word = document.getElementById('word').innerText;
+            await fetch('/uncover/uncover_word', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ word: word })
+            });
+            alert(`${word} has been saved.`);
+            fetchNewWord(); // Fetch a new word after saving
+        }
+
+        async function markAsKnown() {
+            const word = document.getElementById('word').innerText;
+            const formData = new FormData();
+            formData.append("word", word);
+            await fetch('/uncover/mark_as_known', {
+                method: 'POST',
+                body: formData
+            });
+            alert(`${word} has been marked as known.`);
+            fetchNewWord(); // Fetch a new word after marking as known
+        }
+
+        window.onload = function() {
+            fetchNewWord(); // Fetch the first new word when the page loads
+        };
+    </script>
+</head>
+<body>
+    <h1>Word Uncover</h1>
+    <div>
+        <h2 id="word"></h2>
+        <p id="explanation"></p>
+        <button onclick="uncoverWord()">Save Word</button>
+        <button onclick="markAsKnown()">Mark as Known</button>
+    </div>
+</body>
+</html>

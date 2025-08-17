@@ -1,11 +1,18 @@
+import logging
 import os
 from typing import List
 
 from openai import OpenAI
 from pydantic import SecretStr
 
+logger = logging.getLogger(__name__)
+
 
 class LLMModel:
+
+    _token_in_cache_price = 0.07 / 1e6
+    _token_in_cache_miss_price = 0.27 / 1e6
+    _token_out_price = 1.1 / 1e6
 
     def __init__(self, key: SecretStr):
         self.key = key
@@ -21,7 +28,15 @@ class LLMModel:
             ],
             stream=False
         )
-
+        token_in_cache = response.usage.prompt_cache_hit_tokens
+        token_in_cache_miss = response.usage.prompt_cache_miss_tokens
+        token_out = response.usage.completion_tokens
+        price = (
+                token_in_cache * self._token_in_cache_price +
+                token_in_cache_miss * self._token_in_cache_miss_price +
+                token_out * self._token_out_price
+                 )
+        logger.info(price)
         return response.choices[0].message.content
 
     @staticmethod
