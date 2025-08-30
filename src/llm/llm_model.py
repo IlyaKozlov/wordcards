@@ -1,9 +1,11 @@
 import logging
 import os
-from typing import List
 
 from openai import OpenAI
 from pydantic import SecretStr
+
+from llm.llm_model_cache import LLMCache
+from llm.llm_utils import get_hash
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +20,18 @@ class LLMModel:
         self.key = key
         base_url = "https://api.deepseek.com"
         self._model = OpenAI(api_key=key.get_secret_value(), base_url=base_url)
+        self.cache = LLMCache()
 
     def invoke(self, prompt: str) -> str:
+        key = get_hash(prompt)
+        cached_value = self.cache.get(key)
+        if cached_value is None:
+            value = self._call(prompt)
+            self.cache.put(key, value)
+            return value
+        return cached_value
+
+    def _call(self, prompt: str) -> str:
         response = self._model.chat.completions.create(
             model="deepseek-chat",
             messages=[
@@ -43,18 +55,3 @@ class LLMModel:
     def from_env() -> "LLMModel":
         key = SecretStr(os.getenv("LLM_API_KEY_DS"))
         return LLMModel(key)
-
-    @staticmethod
-    def get_code_blocs(text: str) -> List[str]:
-        started = False
-        result = []
-        block = []
-        for line in text.split("\n"):
-            if line.startswith("```"):
-                if started:
-                    result.append("\n".join(block))
-                started = not started
-            elif started:
-                block.append(line)
-        return result
-

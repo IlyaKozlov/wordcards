@@ -1,11 +1,9 @@
 import json
-import os
 from pathlib import Path
 from typing import List
 
-from openai import OpenAI
-
-from generator.llm_model import LLMModel
+from llm.llm_model import LLMModel
+from llm.llm_utils import get_code_blocs
 from schemas.word_explanation import WordExplanation
 
 
@@ -19,7 +17,7 @@ class GenerateWordExplanation:
         template = path.read_text()
         prompt = template.replace("WORD", word)
         result = self.model.invoke(prompt)
-        blocks = self.model.get_code_blocs(result)
+        blocks = get_code_blocs(result)
         block = blocks[0]
         raw_json = json.loads(block)
         result = []

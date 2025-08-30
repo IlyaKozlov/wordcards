@@ -4,8 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Uncover</title>
+    <style>
+        body {
+            font-family: monospace; /* Use a monospace font for consistent character width */
+            max-width: calc(66ch + 1em); /* 66 characters + some padding */
+            margin: 0 auto; /* Center the text block */
+            padding: 1em;
+            line-height: 1.5; /* Optional: improve readability */
+        }
+    </style>
+
     <script>
         async function fetchNewWord() {
+            document.getElementById('word').innerText = "Wait";
+            document.getElementById('explanation').innerText = "Wait a second";
             const response = await fetch('/uncover/show_new_word');
             const wordData = await response.json();
             if (wordData.word) {
@@ -19,12 +31,11 @@
 
         async function uncoverWord() {
             const word = document.getElementById('word').innerText;
+            const formData = new FormData();
+            formData.append("word", word);
             await fetch('/uncover/uncover_word', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ word: word })
+                body: formData
             });
             alert(`${word} has been saved.`);
             fetchNewWord(); // Fetch a new word after saving
@@ -38,13 +49,21 @@
                 method: 'POST',
                 body: formData
             });
-            alert(`${word} has been marked as known.`);
             fetchNewWord(); // Fetch a new word after marking as known
         }
 
         window.onload = function() {
             fetchNewWord(); // Fetch the first new word when the page loads
         };
+
+        function markAsKnownKey(e) {
+
+            if (e.key === 'k' ) {
+                // call your function to do the thing
+                markAsKnown();
+            }
+    }
+    document.addEventListener("keydown", markAsKnownKey);
     </script>
 </head>
 <body>

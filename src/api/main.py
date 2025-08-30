@@ -7,17 +7,12 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
+from api.routes.add_words import add_words
 from api.routes.uncover import uncover
+from utils import setup_logging
 
 logger = getLogger(__name__)
 
-
-def setup_logging():
-    handler = logging.StreamHandler(sys.stderr)
-    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
 
 
 app = FastAPI()
@@ -30,6 +25,7 @@ app.add_middleware(
 )
 
 app.include_router(uncover, prefix="/uncover")
+app.include_router(add_words, prefix="/add_words")
 
 
 @app.get("/")
@@ -61,4 +57,5 @@ def root():
 
 if __name__ == "__main__":
     setup_logging()
+    logger.info("Starting uvicorn")
     uvicorn.run(host="0.0.0.0", port=1155, app=app)

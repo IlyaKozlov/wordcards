@@ -6,7 +6,7 @@ from typing import List
 
 import requests
 
-from generator.llm_model import LLMModel
+from llm.llm_model import LLMModel
 
 logger = logging.getLogger(__name__)
 
