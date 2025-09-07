@@ -4,7 +4,7 @@ I want to get a translation and explanation for a word 'WORD'
 
 Please give me
 1 An explanation of this word, if the word has different meanings answer with each of them.
-2 Give 3 examples of the word in a sentence, mark the word with _ in the beginning and in the end.
+2 Give 10 examples of the word in a sentence, mark the word with _ in the beginning and in the end.
 3 Give a translation for a word
 
 

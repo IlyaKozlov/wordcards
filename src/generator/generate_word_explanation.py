@@ -31,4 +31,8 @@ if __name__ == '__main__':
     from dotenv import load_dotenv
     from pprint import pprint
     load_dotenv("/home/padre/rojects/learn/wordcards/.env")
-    pprint(GenerateWordExplanation().generate_word_explanation("chinchilla"))
+    i = 0
+    for item in GenerateWordExplanation().generate_word_explanation("chinchilla"):
+        for example in item.sentences:
+            i += 1
+            print(i, example)

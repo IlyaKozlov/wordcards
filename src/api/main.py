@@ -1,18 +1,18 @@
-import logging
-import sys
 from logging import getLogger
+from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
 from api.routes.add_words import add_words
+from api.routes.translate import translate_route
 from api.routes.uncover import uncover
 from utils import setup_logging
+from dotenv import load_dotenv
 
 logger = getLogger(__name__)
-
+load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 
 app = FastAPI()
@@ -26,6 +26,7 @@ app.add_middleware(
 
 app.include_router(uncover, prefix="/uncover")
 app.include_router(add_words, prefix="/add_words")
+app.include_router(translate_route, prefix="/translate")
 
 
 @app.get("/")
