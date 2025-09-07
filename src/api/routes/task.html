@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Explanation Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .hidden {
+            display: none;
+        }
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Word Explanation Game</h1>
+    <div id="explanation"></div>
+    <div id="task" class="hidden">
+        <h2>Choose the correct explanation:</h2>
+        <button class="button" id="button1" onclick="checkAnswer(1)">1</button>
+        <button class="button" id="button2" onclick="checkAnswer(2)">2</button>
+        <button class="button" id="button3" onclick="checkAnswer(3)">3</button>
+        <button class="button" id="button4" onclick="checkAnswer(4)">4</button>
+    </div>
+    <button id="okButton" class="hidden" onclick="getNewTask()">OK</button>
+
+    <script>
+        let taskId;
+        let rightAnswer;
+
+        async function getNewTask() {
+            const response = await fetch('/tasks/tasks');
+            if (!response.ok) {
+                console.error("Failed to fetch new task");
+                return;
+            }
+            const data = await response.json();
+            taskId = data.task_id;
+            rightAnswer = parseInt(data.right_answer);
+            document.getElementById('okButton').classList.add('hidden');
+            document.getElementById('explanation').textContent = data.explanation;
+            document.getElementById('task').classList.remove('hidden');
+            document.getElementById('button1').textContent = data.word1;
+            document.getElementById('button2').textContent = data.word2;
+            document.getElementById('button3').textContent = data.word3;
+            document.getElementById('button4').textContent = data.word4;
+        }
+
+        async function checkAnswer(answer) {
+            const formData = new FormData();
+            formData.append('answer', answer.toString());
+            formData.append('task_id', taskId);
+
+            const response = await fetch('/tasks/check', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                console.error("Failed to check answer");
+                return;
+            }
+
+            const result = await response.json();
+            document.getElementById('task').classList.add('hidden');
+            if (result.is_true) {
+                // Correct answer, get a new task
+                getNewTask();
+            } else {
+                // Incorrect answer, show explanation
+                document.getElementById('explanation').textContent = result.explanation;
+                document.getElementById('explanation').classList.remove('hidden');
+                document.getElementById('okButton').classList.remove('hidden');
+            }
+        }
+
+        // Listen for keyboard events
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (key >= '1' && key <= '4') {
+                checkAnswer(parseInt(key));
+            }
+        });
+
+        // Start the game by fetching the first task
+        getNewTask();
+    </script>
+
+</body>
+</html>

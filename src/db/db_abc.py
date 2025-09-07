@@ -1,28 +1,20 @@
 import abc
-import os
-import sqlite3
+import json
+import shutil
 from pathlib import Path
+from typing import List, Dict
 
 
 class Database(abc.ABC):
+    _directory_path = Path(__file__).parent.parent.parent / "db"
 
-    def __init__(self, db_name: str):
-        self.path = Path(os.getenv("HOME")) / ".wordcards" / "db.sqlite"
-        self.db_name = db_name
-        self.connection = None
-        self.cursor = None
+    _path_existing = _directory_path / "existing_words.json"
+    _path_known = _directory_path / "known_words.json"
+    _path_new = _directory_path / "new_words.json"
 
-    def __enter__(self):
-        os.makedirs(self.path.parent, exist_ok=True)
-        self.connection = sqlite3.connect(self.path)
-        self.cursor = self.connection.cursor()
-        self._create_tables()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.connection.commit()  # Commit any changes
-        self.connection.close()    # Close the connection
-
-    @abc.abstractmethod
-    def _create_tables(self):
-        raise NotImplementedError()
+    @staticmethod
+    def save_object(obj: List | Dict, path: Path) -> None:
+        tmp_path = path.parent / (path.name + ".tmp")
+        with open(tmp_path, "w") as file:
+            json.dump(obj=obj, fp=file, indent=4, ensure_ascii=False)
+        shutil.move(tmp_path, path)
