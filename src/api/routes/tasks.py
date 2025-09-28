@@ -8,6 +8,7 @@ from fastapi.routing import APIRouter
 from starlette.responses import HTMLResponse
 
 from db.task_db import TaskDB
+from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
 from schemas.tasks.task_status import TaskStatus
 from schemas.tasks.word2explanation import Word2Explanation
 from task_generator import TaskGenerator
@@ -18,7 +19,7 @@ generator = TaskGenerator()
 
 
 @tasks.get("/tasks")
-def get_new_task() -> Word2Explanation:
+def get_new_task() -> Word2Explanation | SentenceWithPlaceholder:
     return generator.new_task()
 
 

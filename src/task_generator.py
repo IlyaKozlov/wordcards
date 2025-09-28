@@ -3,7 +3,9 @@ import uuid
 from http.client import HTTPException
 
 from db.task_db import TaskDB
+from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
 from schemas.tasks.word2explanation import Word2Explanation
+from schemas.word_explanation import WordExplanation
 
 
 class TaskGenerator:
@@ -11,8 +13,12 @@ class TaskGenerator:
     def __init__(self):
         self.db = TaskDB()
 
-    def new_task(self) -> Word2Explanation:
-        return random.choice([self._word2explanation, self._explanation2word])()
+    def new_task(self) -> Word2Explanation | SentenceWithPlaceholder:
+        return random.choice([
+            self._word2explanation,
+            self._explanation2word,
+            self._sentence_with_placeholder,
+        ])()
 
     def _explanation2word(self) -> Word2Explanation:
         items = self.db.get_four_words()
@@ -29,11 +35,23 @@ class TaskGenerator:
         )
         return Word2Explanation(
             task_id=task_id,
-            word1=items[0].explanation,
-            word2=items[1].explanation,
-            word3=items[2].explanation,
-            word4=items[3].explanation,
+            word1=items[0].explanation_hidden,
+            word2=items[1].explanation_hidden,
+            word3=items[2].explanation_hidden,
+            word4=items[3].explanation_hidden,
             explanation=items[right_answer_id].word,
+        )
+
+    def _sentence_with_placeholder(self) -> SentenceWithPlaceholder:
+        items = self.db.get_four_words()
+        item: WordExplanation = random.choice(items)
+        sentence: str = random.choice(item.sentences_with_placeholder)
+        return SentenceWithPlaceholder(
+            task_id=str(uuid.uuid4()),
+            explanation=item.explanation_hidden,
+            word=item.word,
+            word_part=item.word_part,
+            sentence=sentence,
         )
 
     def _word2explanation(self) -> Word2Explanation:
@@ -55,5 +73,5 @@ class TaskGenerator:
             word2=items[1].word,
             word3=items[2].word,
             word4=items[3].word,
-            explanation=items[right_answer_id].explanation,
+            explanation=items[right_answer_id].explanation_hidden,
         )

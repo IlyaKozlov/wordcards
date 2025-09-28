@@ -7,6 +7,12 @@ Please give me
 2 Give 10 examples of the word in a sentence, mark the word with _ in the beginning and in the end.
 3 Give a translation for a word
 
+Note: you should cower word itself and it forms with underscores, for example
+input:
+    apple
+output:
+    _apple_ if a fruit, the _apples_ are ...
+
 
 Answer with the list of json:
 
@@ -27,7 +33,7 @@ Output:
 [
   {
     "meaning": "Literal meaning",
-    "explanation": "A sheep is a domesticated mammal (*Ovis aries*) raised for its wool, meat (mutton or lamb), and milk. They are known for their docile nature and flocking behavior. ",
+    "explanation": "A _sheep_ is a domesticated mammal (*Ovis aries*) raised for its wool, meat (mutton or lamb), and milk. They are known for their docile nature and flocking behavior. ",
     "sentences": [
       "_Sheep_ is eating the grass in the meadow.",
       "These _sheep_ are well-known by it thin whool.",
@@ -48,7 +54,7 @@ Output
 [
   {
     "meaning": "Literal meaning",
-    "explanation": "A goose is a large waterfowl (*Anatidae* family) with a long neck, webbed feet, and a loud honking call. Geese are known for their migratory habits and are often domesticated for meat, eggs, and feathers.",
+    "explanation": "A _goose_ is a large waterfowl (*Anatidae* family) with a long neck, webbed feet, and a loud honking call. _Geese_ are known for their migratory habits and are often domesticated for meat, eggs, and feathers.",
     "sentences": [
       "The _goose_ waddled across the yard, honking loudly.",
       "We saw a flock of wild _geese_ flying south for the winter.",
@@ -58,7 +64,7 @@ Output
   },
   {
     "meaning": "Slang meaning",
-    "explanation": "In slang, 'goose' can mean to poke or prod someone playfully, often in a teasing or mischievous way. It can also refer to a silly or foolish person.",
+    "explanation": "In slang, _'goose'_ can mean to poke or prod someone playfully, often in a teasing or mischievous way. It can also refer to a silly or foolish person.",
     "sentences": [
       "He _goosed_ his friend to make him jump.",
       "Don't be such a _goose_—think before you act!",
@@ -68,7 +74,7 @@ Output
   },
   {
     "meaning": "Mechanical term",
-    "explanation": "In mechanics, 'goose' can refer to a type of flexible coupling or a device used to control airflow, such as a 'gooseneck' pipe or lamp.",
+    "explanation": "In mechanics, _'goose'_ can refer to a type of flexible coupling or a device used to control airflow, such as a _'gooseneck'_ pipe or lamp.",
     "sentences": [
       "The mechanic adjusted the _gooseneck_ on the exhaust pipe.",
       "She bent the _gooseneck_ lamp to direct the light onto her book.",
