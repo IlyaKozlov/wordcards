@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Explanation Game</title>
+    <title>Word Learning App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,26 +18,41 @@
             padding: 10px 20px;
             font-size: 18px;
         }
+        .highlight {
+            background-color: lightgreen;
+        }
+        .input-container {
+            display: inline;
+        }
     </style>
 </head>
 <body>
 
-    <p id="taskPlaceholder"> </p>
+    <h1 id="game-title">Word Learning Game</h1>
 
-    <h1>Word Explanation Game</h1>
-    <div id="explanation"></div>
-    <div id="task" class="hidden">
+    <div id="explanation" class="hidden"></div>
+
+    <div id="word-explanation-game" class="hidden">
         <h2>Choose the correct explanation:</h2>
+        <div id="taskPlaceholder"></div>
         <button class="button" id="button1" onclick="checkAnswer(1)">1</button>
         <button class="button" id="button2" onclick="checkAnswer(2)">2</button>
         <button class="button" id="button3" onclick="checkAnswer(3)">3</button>
         <button class="button" id="button4" onclick="checkAnswer(4)">4</button>
+        <button id="okButton" class="hidden" onclick="getNewTask()">OK</button>
     </div>
-    <button id="okButton" class="hidden" onclick="getNewTask()">OK</button>
+
+    <div id="type-text-game" class="hidden">
+        <h2>Type the Hidden Word</h2>
+        <div id="sentence-container"></div>
+        <button id="submit-button">Submit</button>
+        <div id="message"></div>
+    </div>
 
     <script>
         let taskId;
         let rightAnswer;
+        let taskType;
 
         async function getNewTask() {
             const response = await fetch('/tasks/tasks');
@@ -47,14 +62,26 @@
             }
             const data = await response.json();
             taskId = data.task_id;
-            rightAnswer = parseInt(data.right_answer);
-            document.getElementById('okButton').classList.add('hidden');
+            taskType = data.task_type; // Get the task type
+            if (taskType === "Word2Explanation") {
+                rightAnswer = parseInt(data.right_answer);
+                loadWordExplanationGame(data);
+            } else {
+                loadTypeTextGame(data);
+            }
+        }
+
+        function loadWordExplanationGame(data) {
+            document.getElementById('word-explanation-game').classList.remove('hidden');
+            document.getElementById('type-text-game').classList.add('hidden');
             document.getElementById('explanation').textContent = data.explanation;
-            document.getElementById('task').classList.remove('hidden');
             document.getElementById('button1').textContent = data.word1;
             document.getElementById('button2').textContent = data.word2;
             document.getElementById('button3').textContent = data.word3;
             document.getElementById('button4').textContent = data.word4;
+            document.getElementById('okButton').classList.add('hidden');
+            document.getElementById('taskPlaceholder').textContent = ''; // Clear any previous tasks
+            document.getElementById('taskPlaceholder').innerHTML = data.explanation;
         }
 
         async function checkAnswer(answer) {
@@ -73,7 +100,7 @@
             }
 
             const result = await response.json();
-            document.getElementById('task').classList.add('hidden');
+            document.getElementById('word-explanation-game').classList.add('hidden');
             if (result.is_true) {
                 // Correct answer, get a new task
                 getNewTask();
@@ -85,13 +112,51 @@
             }
         }
 
-        // Listen for keyboard events
-        document.addEventListener('keydown', (event) => {
-            const key = event.key;
-            if (key >= '1' && key <= '4') {
-                checkAnswer(parseInt(key));
+        function loadTypeTextGame(data) {
+            document.getElementById('type-text-game').classList.remove('hidden');
+            document.getElementById('word-explanation-game').classList.add('hidden');
+            const placeholder = "PLACEHOLDER";
+            const sentenceWithInput = data.sentence.replace(placeholder, '<input type="text" id="input-field" class="input-container" />');
+            document.getElementById('sentence-container').innerHTML = sentenceWithInput;
+
+            const inputField = document.getElementById('input-field');
+            const hiddenWord = data.word; // Assuming `data.word` contains the word to be guessed
+
+            inputField.addEventListener('input', function() {
+                const userInput = this.value;
+                const commonPrefixLength = getCommonPrefixLength(userInput, hiddenWord);
+                const highlightedText = hiddenWord.substring(0, commonPrefixLength);
+                const remainingText = hiddenWord.substring(commonPrefixLength);
+
+                // Highlight the common prefix
+                const highlightedWord = `<span class="highlight">${highlightedText}</span>`;
+                this.style.borderColor = (userInput === hiddenWord) ? 'green' : 'red';
+                document.getElementById('message').innerHTML = highlightedWord;
+
+                // Check if the user input matches the hidden word
+                if (userInput === hiddenWord) {
+                    alert('Word matched!');
+                    document.getElementById('message').innerHTML = "You typed the correct word!";
+                }
+            });
+
+            document.getElementById('submit-button').onclick = function() {
+                const userInput = inputField.value;
+                if (userInput === hiddenWord) {
+                    alert('Submitted: ' + userInput);
+                } else {
+                    alert('Incorrect word, try again!');
+                }
+            };
+        }
+
+        function getCommonPrefixLength(str1, str2) {
+            let length = 0;
+            while (length < str1.length && length < str2.length && str1[length] === str2[length]) {
+                length++;
             }
-        });
+            return length;
+        }
 
         // Start the game by fetching the first task
         getNewTask();

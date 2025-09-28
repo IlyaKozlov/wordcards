@@ -29,15 +29,16 @@
             }
         }
 
-        async function uncoverWord() {
+        async function saveWord() {
             const word = document.getElementById('word').innerText;
             const formData = new FormData();
             formData.append("word", word);
+            await markAsKnown();
             await fetch('/uncover/uncover_word', {
                 method: 'POST',
                 body: formData
             });
-            alert(`${word} has been saved.`);
+
             fetchNewWord(); // Fetch a new word after saving
         }
 
@@ -56,14 +57,30 @@
             fetchNewWord(); // Fetch the first new word when the page loads
         };
 
+        function saveWordKey(e) {
+
+            if (e.key === 's' ) {
+                // call your function to do the thing
+                saveWord();
+            }
+            else if (e.key === 'ы' ) {
+                // call your function to do the thing
+                saveWord();
+            }
+    }
         function markAsKnownKey(e) {
 
             if (e.key === 'k' ) {
                 // call your function to do the thing
                 markAsKnown();
             }
+            else if (e.key === 'л' ) {
+                // call your function to do the thing
+                markAsKnown();
+            }
     }
     document.addEventListener("keydown", markAsKnownKey);
+    document.addEventListener("keydown", saveWordKey);
     </script>
 </head>
 <body>
@@ -71,7 +88,7 @@
     <div>
         <h2 id="word"></h2>
         <p id="explanation"></p>
-        <button onclick="uncoverWord()">Save Word</button>
+        <button onclick="saveWord()">Save Word</button>
         <button onclick="markAsKnown()">Mark as Known</button>
     </div>
 </body>

@@ -36,29 +36,7 @@ def root():
     return "Hi"
 
 
-# class Answer(BaseModel):
-#     uuid: str
-#     chosen: str
-#
-#
-# @app.post("/answer")
-# def check_answer(answer: Answer):
-#     with TaskDatabase() as db:
-#         true_answer = db.get_answer(answer.uuid)
-#         if true_answer == answer.chosen:
-#             logger.info(f"Answer {answer.chosen} {answer.uuid} is correct")
-#             return True
-#     logger.info(f"Answer {answer.chosen} {answer.uuid} is incorrect")
-#     return False
-#
-#
-# @app.get("/translate")
-# def translate(word: str) -> str:
-#
-#     return Translator.translate(word)
-
-
 if __name__ == "__main__":
     setup_logging()
     logger.info("Starting uvicorn")
-    uvicorn.run(host="0.0.0.0", port=1155, app=app)
+    uvicorn.run(host="0.0.0.0", port=2218, app=app)
