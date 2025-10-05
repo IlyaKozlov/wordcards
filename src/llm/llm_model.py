@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Iterator
 
 from openai import OpenAI
 from pydantic import SecretStr
@@ -31,6 +32,19 @@ class LLMModel:
             return value
         return cached_value
 
+    def invoke_stream(self, prompt: str) -> Iterator[str]:
+        key = get_hash(prompt)
+        cached_value = self.cache.get(key)
+        if cached_value is None:
+            stream = self._call_stream(prompt)
+            value = ""
+            for item in stream:
+                value += item
+                yield item
+            self.cache.put(key, value)
+        else:
+            yield from cached_value
+
     def _call(self, prompt: str) -> str:
         response = self._model.chat.completions.create(
             model="deepseek-chat",
@@ -50,6 +64,18 @@ class LLMModel:
                  )
         logger.info(price)
         return response.choices[0].message.content
+
+    def _call_stream(self, prompt: str) -> Iterator[str]:
+        response = self._model.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "You are a native english speaker"},
+                {"role": "user", "content": prompt},
+            ],
+            stream=True
+        )
+        for item in response:
+            yield "".join(_.delta.content for _ in item.choices)
 
     @staticmethod
     def from_env() -> "LLMModel":

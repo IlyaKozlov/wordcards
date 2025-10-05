@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translator</title>
+    <style>
+        [tooltip]:active::after {
+            content: attr(tooltip);
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #output {
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+         .hint {
+            background-color: #ddd;
+            display: inline-block;
+            padding: 8px 12px;
+            position: relative;
+            cursor: pointer; /* Change cursor to indicate it's clickable */
+        }
+
+        .hint:not(.active) {
+            background-color: #eee;
+            color: #eee;
+            min-width: 96px;
+            user-select: none;
+        }
+
+        .hint:not(.active)::before {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            content: 'Click to reveal'; /* non-breaking spaces probably necessary */
+            color: #999;
+        }
+
+        .hintUnravel {
+            background-color: #ddd;
+            display: inline-block;
+            padding: 8px 12px;
+            position: relative;
+        }
+
+        .hidden-content {
+            display: none; /* Initially hidden */
+        }
+
+        .hint.active .hidden-content {
+            display: inline; /* Show content when active */
+            color: #000; /* Change color to visible */
+        }
+
+    </style>
+</head>
+<body>
+
+
+<h1>Translation App</h1>
+<form id="translateForm">
+    <label for="word">Enter a word or phrase:</label><br>
+    <textarea id="word" name="word" cols="66" rows="5"></textarea>
+    <br>
+    <button type="submit">Translate</button>
+</form>
+
+
+<div id="output"></div>
+
+<script>
+    function toggleHint(element) {
+        element.classList.remove("hint")
+        element.classList.add("hintUnravel")
+    }
+
+    document.getElementById('translateForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const word = document.getElementById('word').value;
+        const outputDiv = document.getElementById('output');
+
+        outputDiv.innerHTML = 'Wait a bit...'; // Initial message
+
+        const response = await fetch('/translate/translate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ word })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let result = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunks = decoder.decode(value, { stream: true }).split('\n');
+            for (const chunk of chunks) {
+                if (chunk.trim() === '') continue; // Ignore empty strings
+
+                try {
+                    const data = JSON.parse(chunk);
+                    const { text, message_type } = data;
+
+                    // Handle different message types
+                    if (message_type === 'normal') {
+                        result += text + '\n';
+                    } else if (message_type === 'bold') {
+                        result += `<strong>${text}</strong>\n`;
+                    } else if (message_type === 'italic') {
+                        result += `<em>${text}</em>\n`;
+                    } else if (message_type === 'spoiler' && text !== "") {
+                        result += `<div class="hint" onclick="toggleHint(this)" >${text}</div>\n`;
+                    }
+
+                    // Update the output
+                    outputDiv.innerHTML = result;
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

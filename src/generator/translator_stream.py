@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Iterable, Tuple
 
 from db.words_cnt import WordsCounter
+from generator.page_to_normalized import PageToNormalized
 from llm.llm_model import LLMModel
 from schemas.chunk import Chunk
 
@@ -17,6 +18,7 @@ class TranslatorStream:
         self._latin = "abcdefghijklmnopqrstuvwxyz"
         self._templates = Path(__file__).parent / "prompts"
         assert self._templates.is_dir()
+        self.normalizer = PageToNormalized(model)
         self.counter = WordsCounter()
 
     @staticmethod
@@ -46,9 +48,11 @@ class TranslatorStream:
             batch += letter
             if len(batch) > max_len or letter == "\n":
                 if batch.strip() != "```":
+                    print(batch)
                     yield batch
                 batch = ""
         if len(batch) > 0 and batch.strip() != "```":
+            print(batch)
             yield batch
 
     def _cnt_letters(self, message: str) -> Tuple[int, int, int]:
@@ -61,14 +65,27 @@ class TranslatorStream:
         return latin_cnt, cyrillic_cnt, word_cnt
 
     def _translate_en_ru(self, message: str):
+        message = message.strip()
         with open(self._templates / "translate_en_ru.txt") as f:
             template = f.read()
         prompt = template.format(message=message)
         yield from (
             Chunk(text)
-            for text in self._batch(self.model.invoke(prompt))
+            for text in self._batch(self.model.invoke_stream(prompt))
             if len(text) > 0
         )
+
+        logger.info("Update dict")
+        words = [
+            w
+            for w in message.split()
+            if self.normalizer.normalize_page(message).strip()
+        ]
+        if len(words) <= 2:
+            self.counter.put(" ".join(words), weight=3)
+        else:
+            for w in words:
+                self.counter.put(w, weight=1)
 
     def _translate_ru_en(self, message: str):
         with open(self._templates / "translate_ru_en.txt") as f:
@@ -76,6 +93,6 @@ class TranslatorStream:
         prompt = template.format(message=message)
         yield from (
             Chunk(text)
-            for text in self._batch(self.model.invoke(prompt))
+            for text in self._batch(self.model.invoke_stream(prompt))
             if len(text) > 0
         )

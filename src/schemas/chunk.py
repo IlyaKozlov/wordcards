@@ -1,18 +1,21 @@
 from schemas.message_type import MessageType
+from pydantic import BaseModel
 
 
-class Chunk:
+class Chunk(BaseModel):
+    text: str
+    message_type: MessageType
 
     def __init__(self, message: str):
         assert len(message) > 0
-        self.message = message
         text = message.strip()
         if text.startswith("**"):
-            self.message_type = MessageType.BOLD.value
+            message_type = MessageType.BOLD
         elif text.startswith("Synonyms"):
-            self.message_type = MessageType.ITALIC.value
+            message_type = MessageType.ITALIC
         elif text.startswith("<RUS>"):
-            self.message = message.replace("<RUS>", "")
-            self.message_type = MessageType.SPOILER.value
+            text = message.replace("<RUS>", "")
+            message_type = MessageType.SPOILER
         else:
-            self.message_type = ""
+            message_type = MessageType.NORMAL
+        super().__init__(text=text, message_type=message_type)
