@@ -20,6 +20,15 @@
             document.getElementById('explanation').innerText = "Wait a second";
             const response = await fetch('/uncover/show_new_word');
             const wordData = await response.json();
+            if (wordData.words_statistics) {
+                const stat = wordData.words_statistics;
+                const nUncovered = stat.n_uncovered_words;
+                const nWords = stat.n_words;
+                const textStatistics = `n_words = ${nUncovered} / ${nWords}`;
+                const element = document.getElementById('word_count_statistics');
+                element.innerText = textStatistics;
+                element.classList.remove('hidden');
+            }
             if (wordData.word) {
                 document.getElementById('word').innerText = wordData.word;
                 document.getElementById('explanation').innerText = wordData.explanation;
@@ -34,7 +43,7 @@
             const formData = new FormData();
             formData.append("word", word);
             await markAsKnown();
-            await fetch('/uncover/uncover_word', {
+            await fetch('/uncover/save_word', {
                 method: 'POST',
                 body: formData
             });
@@ -84,12 +93,13 @@
     </script>
 </head>
 <body>
-    <h1>Word Uncover</h1>
+    <h1>Word Uncover </h1>
+    <p class="hidden" id="word_count_statistics"></p>
     <div>
         <h2 id="word"></h2>
-        <p id="explanation"></p>
         <button onclick="saveWord()">Save Word</button>
         <button onclick="markAsKnown()">Mark as Known</button>
+        <p id="explanation"></p>
     </div>
 </body>
 </html>

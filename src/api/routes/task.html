@@ -73,6 +73,7 @@
     let taskId;
     let rightAnswer;
     let taskType;
+    let completed = 0;
 
     async function getNewTask() {
         document.getElementById('explanation').classList.add('hidden');
@@ -90,6 +91,8 @@
         } else {
             loadTypeTextGame(data);
         }
+        document.getElementById('game-title').textContent = `Word Learning Game - Completed: ${completed}`;
+        completed += 1;
     }
 
     function loadWordExplanationGame(data) {
@@ -164,8 +167,8 @@
             // Check if the user input matches the hidden word
             if (userInput.toLowerCase() === hiddenWord.toLowerCase()) {
                 alert(`Word matched! It is "${hiddenWord}"`);
+                checkAnswer(userInput.toLowerCase());
                 document.getElementById('message').innerHTML = "You typed the correct word!";
-                getNewTask();
                 document.getElementById('message').innerHTML = "";
             }
         });

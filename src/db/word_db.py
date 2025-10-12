@@ -31,6 +31,11 @@ class WordDB(Database):
             ls.append(word)
         self.save_object(ls, self._path_known)
 
+    def get_n_know_word(self) -> int:
+        with open(self._path_known) as file:
+            ls = json.load(file)
+        return len(ls)
+
     def save_word_explanation(self, word: str, explanations: List[WordExplanation]) -> None:
         with open(self._path_existing) as f:
             data = json.load(f)

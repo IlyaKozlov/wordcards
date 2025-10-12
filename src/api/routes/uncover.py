@@ -12,6 +12,7 @@ from generator.generate_word_explanation import GenerateWordExplanation
 from generator.translator import Translator
 from paths import path_existing, path_known
 from schemas.word_with_explanation import WordWithExplanation
+from schemas.words_statistic import WordsStatistic
 
 uncover = APIRouter()
 logger = logging.getLogger(__name__)
@@ -29,22 +30,22 @@ def html_form() -> HTMLResponse:
 
 @uncover.get("/translate_all")
 def translate_in_advance() -> str:
-        words = database.get_new_words()
-        translator = Translator()
-        for w in tqdm(words):
-            logger.info(f"translate word in advance '{w}'")
-            translator.translate(w, update_cnt=False)
-            logger.info(f"translate word in advance done '{w}'")
-            logger.info(
-                f"cache miss rate:"
-                f" {translator.cache_miss_cnt / translator.call_cnt:0.2f} "
-                f"({translator.cache_miss_cnt} of {translator.call_cnt})"
-            )
-        return f"translated {len(words)} words"
+    words = database.get_new_words()
+    translator = Translator()
+    for w in tqdm(words):
+        logger.info(f"translate word in advance '{w}'")
+        translator.translate(w, update_cnt=False)
+        logger.info(f"translate word in advance done '{w}'")
+        logger.info(
+            f"cache miss rate:"
+            f" {translator.cache_miss_cnt / translator.call_cnt:0.2f} "
+            f"({translator.cache_miss_cnt} of {translator.call_cnt})"
+        )
+    return f"translated {len(words)} words"
 
 
-@uncover.post("/uncover_word")
-def uncover_word(word: str = Form(), *, background_tasks: BackgroundTasks) -> str:
+@uncover.post("/save_word")
+def save_word(word: str = Form(), *, background_tasks: BackgroundTasks) -> str:
     def save():
         logger.info(f"Start saving word {word}")
         database.save_word_explanation(word, [])
@@ -58,7 +59,9 @@ def uncover_word(word: str = Form(), *, background_tasks: BackgroundTasks) -> st
 
 
 @uncover.post("/mark_as_known")
-def mark_as_known(word: str = Form(...),) -> str:
+def mark_as_known(
+    word: str = Form(...),
+) -> str:
     database.save_know_word(word)
     return "Ok"
 
@@ -66,9 +69,19 @@ def mark_as_known(word: str = Form(...),) -> str:
 @uncover.get("/show_new_word")
 def show_new_word() -> WordWithExplanation:
     words = database.get_new_words(min_cnt=1)
+    n_known_words = database.get_n_know_word()
+    statistics = WordsStatistic(n_words=len(words), n_uncovered_words=n_known_words)
     if len(words) == 0:
-        return WordWithExplanation(word="No new words", explanation="")
+        return WordWithExplanation(
+            word="No new words",
+            explanation="",
+            words_statistics=statistics,
+        )
     else:
         word = words[0]
     explanation = Translator().translate(word, update_cnt=False)
-    return WordWithExplanation(word=word, explanation=explanation)
+    return WordWithExplanation(
+        word=word,
+        explanation=explanation,
+        words_statistics=statistics,
+    )

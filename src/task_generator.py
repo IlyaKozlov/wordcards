@@ -43,11 +43,18 @@ class TaskGenerator:
         )
 
     def _sentence_with_placeholder(self) -> SentenceWithPlaceholder:
+        task_id = str(uuid.uuid4())
         items = self.db.get_four_words()
         item: WordExplanation = random.choice(items)
         sentence: str = random.choice(item.sentences_with_placeholder)
+        self.db.save_task(
+            task_id=task_id,
+            word="",
+            explanation="",
+            right_answer=item.word.lower(),
+        )
         return SentenceWithPlaceholder(
-            task_id=str(uuid.uuid4()),
+            task_id=task_id,
             explanation=item.explanation_hidden,
             word=item.word,
             word_part=item.word_part,

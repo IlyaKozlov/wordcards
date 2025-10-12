@@ -2,7 +2,9 @@ from logging import getLogger
 from pathlib import Path
 
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from starlette.middleware.cors import CORSMiddleware
 
 from api.routes.add_words import add_words
@@ -10,7 +12,6 @@ from api.routes.tasks import tasks
 from api.routes.translate import translate_route
 from api.routes.uncover import uncover
 from utils import setup_logging
-from dotenv import load_dotenv
 
 logger = getLogger(__name__)
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
@@ -34,6 +35,12 @@ app.include_router(tasks, prefix="/tasks", tags=["tasks"])
 @app.get("/")
 def root():
     return "Hi"
+
+
+@app.get("/favicon.ico")
+def icon() -> FileResponse:
+    path: Path = Path(__file__).parent / "icon.ico"
+    return FileResponse(path, media_type="image/x-icon")
 
 
 if __name__ == "__main__":
