@@ -17,6 +17,8 @@ tasks = APIRouter()
 db = TaskDB()
 generator = TaskGenerator()
 
+htmls_path = Path(__file__).parent / "htmls"
+
 
 @tasks.get("/tasks")
 def get_new_task() -> Word2Explanation | SentenceWithPlaceholder:
@@ -38,6 +40,27 @@ def check_answer(answer: str = Form(), task_id: str = Form(...)) -> TaskStatus:
 @tasks.get("")
 def task() -> HTMLResponse:
     with open(Path(__file__).parent / "task.html", "r") as f:
+        code = f.read()
+    return HTMLResponse(code)
+
+
+@tasks.get("/task_experimental")
+def task_experimental() -> HTMLResponse:
+    with open(htmls_path / "task_experimental.html", "r") as f:
+        code = f.read()
+    return HTMLResponse(code)
+
+
+@tasks.get("/task_experimental_word2explanation")
+def task_experimental() -> HTMLResponse:
+    with open(htmls_path / "task_experimental_word2explanation.html", "r") as f:
+        code = f.read()
+    return HTMLResponse(code)
+
+
+@tasks.get("/task_experimental_other")
+def task_experimental_other() -> HTMLResponse:
+    with open(htmls_path / "task_experimental_other.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)
 

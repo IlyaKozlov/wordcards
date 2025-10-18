@@ -37,26 +37,3 @@ class DedocManager:
         if batch:
             result.append("".join(batch))
         return result
-
-
-if __name__ == '__main__':
-    items = (DedocManager().handle(
-        Path("/media/padre/0123-4567/yandex/ooks/history/shortestHistory/shortestHistoryUniverse.pdf")
-    ))
-    model = LLMModel.from_env()
-    for item in items:
-        prefix = "Convert each word to the normal form, for example did -> do, cats -> cat, men -> man\n"
-        prefix += "Drop all punctuations and numbers"
-        prompt = prefix + item
-        answer = model.invoke(prompt)
-        path = "/home/padre/rojects/learn/wordcards/db/dictionary.json"
-        with open(path) as f:
-            d = json.load(f)
-        k = 0
-        n = 0
-        words = sorted(set(answer.split()))
-        for word in words:
-            k += word.lower() in d
-            n += 1
-        logger.info(k, n, k / n)
-        pass

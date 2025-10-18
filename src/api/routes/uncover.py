@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 
 from fastapi import Form, BackgroundTasks
+from fastapi.params import Query
 from fastapi.routing import APIRouter
 from starlette.responses import HTMLResponse
 from tqdm import tqdm
@@ -29,8 +30,8 @@ def html_form() -> HTMLResponse:
 
 
 @uncover.get("/translate_all")
-def translate_in_advance() -> str:
-    words = database.get_new_words()
+def translate_in_advance(min_cnt: str = Query(default="10")) -> str:
+    words = database.get_new_words(min_cnt=int(min_cnt))
     translator = Translator()
     for w in tqdm(words):
         logger.info(f"translate word in advance '{w}'")

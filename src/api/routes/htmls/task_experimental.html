@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <script>
+        function init() {
+            if (!sessionStorage.getItem("task_experimental")) {
+                const response = fetch('/tasks/task_experimental')
+                    response.then(data => data.text()).then(
+                    text => sessionStorage.setItem("task_experimental", text)
+                )
+            }
+        }
+
+        async function getNewTask() {
+            const response = await fetch('/tasks/tasks');
+            if (!response.ok) {
+                console.error("Failed to fetch new task");
+                return;
+            }
+            const data = await response.json();
+            let taskType = data.task_type; // Get the task type
+            if (taskType === "Word2Explanation") {
+                window.location.replace("/tasks/task_experimental_word2explanation");
+            } else {
+                window.location.replace("/tasks/task_experimental_other");
+            }
+        }
+
+        init();
+        getNewTask();
+    </script>
+
+</body>
+</html>

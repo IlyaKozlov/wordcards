@@ -1,3 +1,4 @@
+import logging
 import random
 import uuid
 from http.client import HTTPException
@@ -12,6 +13,7 @@ class TaskGenerator:
 
     def __init__(self):
         self.db = TaskDB()
+        self.logger = logging.getLogger(__name__)
 
     def new_task(self) -> Word2Explanation | SentenceWithPlaceholder:
         return random.choice([
@@ -33,6 +35,7 @@ class TaskGenerator:
                 right_answer_id].explanation,
             right_answer=str(right_answer_id + 1),
         )
+        self.logger.info("Generated task explanation2word")
         return Word2Explanation(
             task_id=task_id,
             word1=items[0].explanation_hidden,
@@ -53,6 +56,7 @@ class TaskGenerator:
             explanation="",
             right_answer=item.word.lower(),
         )
+        self.logger.info("Generated task sentence_with_placeholder")
         return SentenceWithPlaceholder(
             task_id=task_id,
             explanation=item.explanation_hidden,
@@ -62,6 +66,7 @@ class TaskGenerator:
         )
 
     def _word2explanation(self) -> Word2Explanation:
+
         items = self.db.get_four_words()
         if items is None or len(items) != 4:
             raise HTTPException("Not enough items to fetch new task")
@@ -74,6 +79,7 @@ class TaskGenerator:
                 right_answer_id].explanation,
             right_answer=str(right_answer_id + 1),
         )
+        self.logger.info("Generated task word2explanation")
         return Word2Explanation(
             task_id=task_id,
             word1=items[0].word,

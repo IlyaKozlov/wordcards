@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Learning App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            max-width: calc(66ch + 1em); /* 66 characters + some padding */
+            margin: 50px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+
+        .highlight {
+            background-color: lightgreen;
+        }
+
+        .input-container {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+
+
+
+<h1> task experimental word2explanation </h1>
+<div id="step1" class="hidden">Imitate work task Other step 1</div>
+<p id="step2" class="hidden">Imitate work task Other step 2</p>
+
+<script>
+
+    function delay(milliseconds){
+        return new Promise(resolve => {
+            setTimeout(resolve, milliseconds);
+        });
+    }
+
+    async function imitateWork() {
+        await delay(1000);
+        const step1 = document.getElementById('step1');
+        step1.classList.remove('hidden');
+        step1.innerText = 'step1';
+        await delay(1000);
+        const step2 = document.getElementById('step2');
+
+        await delay(1000);
+        step2.classList.remove('hidden');
+        step2.innerText = 'step2';
+        window.location.replace("/tasks/task_experimental");
+
+    }
+
+    imitateWork();
+
+</script>
+</body>
+</html>

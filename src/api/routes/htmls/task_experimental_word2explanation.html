@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Learning App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            max-width: calc(66ch + 1em); /* 66 characters + some padding */
+            margin: 50px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+
+        .highlight {
+            background-color: lightgreen;
+        }
+
+        .input-container {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+
+
+
+<h1> task experimental word2explanation </h1>
+
+<div id="word-explanation-game">
+    <h2>Choose the correct explanation:</h2>
+    <div id="taskPlaceholder"></div>
+    <ol>
+
+        <li>
+            <button id="button1" class="button" onclick="checkAnswer(1)">1</button>
+        </li>
+        <li>
+            <button id="button2" class="button" onclick="checkAnswer(2)">2</button>
+        </li>
+        <li>
+            <button id="button3" class="button" onclick="checkAnswer(3)">3</button>
+        </li>
+        <li>
+            <button id="button4" class="button" onclick="checkAnswer(4)">4</button>
+        </li>
+    </ol>
+
+
+    <button id="okButton" class="hidden" onclick="getNewTask()">OK</button>
+</div>
+
+<script>
+
+    function delay(milliseconds){
+        return new Promise(resolve => {
+            setTimeout(resolve, milliseconds);
+        });
+    }
+
+    async function checkAnswer(answer) {
+        const formData = new FormData();
+        formData.append('answer', answer.toString());
+        formData.append('task_id', taskId);
+
+        const response = await fetch('/tasks/check', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            console.error("Failed to check answer");
+            return;
+        }
+
+        const result = await response.json();
+        document.getElementById('word-explanation-game').classList.add('hidden');
+        if (result.is_true) {
+            // Correct answer, get a new task
+            getNewTask();
+        } else {
+            // Incorrect answer, show explanation
+            let explanation = result.explanation;
+            explanation += `<p> <button onclick="getNewTask()">OK</button> <p>`;
+            document.getElementById('explanation').classList.remove('hidden');
+            document.getElementById('explanation').innerHTML = explanation;
+        }
+    }
+
+    function chooseAnswerKey(e) {
+
+        if (e.key === '1') {
+            // call your function to do the thing
+            checkAnswer(1);
+        } else if (e.key === '2') {
+            // call your function to do the thing
+            checkAnswer(2);
+        } else if (e.key === '3') {
+            // call your function to do the thing
+            checkAnswer(3);
+        } else if (e.key === '4') {
+            // call your function to do the thing
+            checkAnswer(4);
+        }
+    }
+
+    document.addEventListener("keydown", chooseAnswerKey);
+
+</script>
+</body>
+</html>
