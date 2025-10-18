@@ -4,58 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Translator</title>
-    <style>
-        [tooltip]:active::after {
-            content: attr(tooltip);
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #output {
-            margin-top: 20px;
-            white-space: pre-wrap;
-        }
-         .hint {
-            background-color: #ddd;
-            display: inline-block;
-            padding: 8px 12px;
-            position: relative;
-            cursor: pointer; /* Change cursor to indicate it's clickable */
-        }
-
-        .hint:not(.active) {
-            background-color: #eee;
-            color: #eee;
-            min-width: 96px;
-            user-select: none;
-        }
-
-        .hint:not(.active)::before {
-            position: absolute;
-            top: 8px;
-            left: 12px;
-            content: 'Click to reveal'; /* non-breaking spaces probably necessary */
-            color: #999;
-        }
-
-        .hintUnravel {
-            background-color: #ddd;
-            display: inline-block;
-            padding: 8px 12px;
-            position: relative;
-        }
-
-        .hidden-content {
-            display: none; /* Initially hidden */
-        }
-
-        .hint.active .hidden-content {
-            display: inline; /* Show content when active */
-            color: #000; /* Change color to visible */
-        }
-
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
