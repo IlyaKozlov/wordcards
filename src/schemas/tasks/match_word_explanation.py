@@ -12,3 +12,5 @@ class MatchWordExplanation(BaseModel):
 
     word4: str
     explanation4: str
+
+    task_type: str = "MatchWordExplanation"

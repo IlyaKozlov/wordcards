@@ -15,8 +15,6 @@
             flex-direction: column;
         }
         .box {
-            width: 120px;
-            height: 50px;
             border: 1px solid #000;
             display: flex;
             align-items: center;
@@ -24,6 +22,10 @@
             margin: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
+            max-width: 200px; /* Adjust as needed */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
         }
         .matched {
             background-color: green;
@@ -47,11 +49,12 @@
         <div class="column" id="explanationsContainer"></div>
     </div>
     <script>
+        const task = JSON.parse(sessionStorage.getItem('task_content'));
         const data = [
-            { word: 'Word1', explanation: 'Explanation1' },
-            { word: 'Word2', explanation: 'Explanation2' },
-            { word: 'Word3', explanation: 'Explanation3' },
-            { word: 'Word4', explanation: 'Explanation4' }
+            { word: task.word1, explanation: task.explanation1},
+            { word: task.word2, explanation: task.explanation2},
+            { word: task.word3, explanation: task.explanation3},
+            { word: task.word4, explanation: task.explanation4}
         ];
 
         const wordsContainer = document.getElementById('wordsContainer');
@@ -72,7 +75,7 @@
             const div = document.createElement('div');
             div.className = 'box';
             div.id = `word-${index + 1}`;
-            div.textContent = item.word;
+            div.innerHTML = `<span style="font-size: larger; font-weight: bold;">${item.word}</span>`;
             div.onclick = () => handleWordClick(div, item);
             wordsContainer.appendChild(div);
         });
@@ -96,6 +99,18 @@
             box.classList.add('selected');
         }
 
+        function reorderAfterMatch() {
+            const matched = [...wordsContainer.children].filter(box => box.classList.contains('matched'));
+            const nonMatched = [...wordsContainer.children].filter(box => !box.classList.contains('matched'));
+            const explanationsMatched = [...explanationsContainer.children].filter(box => box.classList.contains('matched'));
+            const explanationsNonMatched = [...explanationsContainer.children].filter(box => !box.classList.contains('matched'));
+
+            matched.forEach(box => wordsContainer.appendChild(box));
+            nonMatched.forEach(box => wordsContainer.appendChild(box));
+            explanationsMatched.forEach(box => explanationsContainer.appendChild(box));
+            explanationsNonMatched.forEach(box => explanationsContainer.appendChild(box));
+        }
+
         function handleExplanationClick(explanationItem) {
             if (selectedWord) {
                 if (selectedWord.item.explanation === explanationItem.explanation) {
@@ -103,12 +118,12 @@
                     const index = [...explanationsContainer.children].findIndex(box => box.textContent === explanationItem.explanation);
                     explanationsContainer.children[index].classList.add('matched');
                     setTimeout(() => {
-                        selectedWord.box.remove();
-                        explanationsContainer.children[index].remove();
+                        wordsContainer.appendChild(selectedWord.box);
+                        explanationsContainer.appendChild(explanationsContainer.children[index]);
                         reorderSquares();
                     }, 500);
+                    reorderAfterMatch();
                 } else {
-                    alert("Incorrect match!");
                     const explanationBox = [...explanationsContainer.children].find(box => box.textContent === explanationItem.explanation);
                     explanationBox.classList.add('incorrect');
                     setTimeout(() => {
