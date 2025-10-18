@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Words Game</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            margin: 10px;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+        }
+        .box {
+            width: 120px;
+            height: 50px;
+            border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .matched {
+            background-color: green;
+        }
+        .incorrect {
+            background-color: red;
+            animation: flash 0.5s;
+        }
+        .selected {
+            background-color: lightgray;
+        }
+        @keyframes flash {
+            0% { background-color: red; }
+            100% { background-color: white; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="column" id="wordsContainer"></div>
+        <div class="column" id="explanationsContainer"></div>
+    </div>
+    <script>
+        const data = [
+            { word: 'Word1', explanation: 'Explanation1' },
+            { word: 'Word2', explanation: 'Explanation2' },
+            { word: 'Word3', explanation: 'Explanation3' },
+            { word: 'Word4', explanation: 'Explanation4' }
+        ];
+
+        const wordsContainer = document.getElementById('wordsContainer');
+        const explanationsContainer = document.getElementById('explanationsContainer');
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        shuffle(data);
+        const explanations = [...data];
+        shuffle(explanations);
+
+        data.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'box';
+            div.id = `word-${index + 1}`;
+            div.textContent = item.word;
+            div.onclick = () => handleWordClick(div, item);
+            wordsContainer.appendChild(div);
+        });
+
+        explanations.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'box';
+            div.id = `explanation-${index + 1}`;
+            div.textContent = item.explanation;
+            div.onclick = () => handleExplanationClick(item);
+            explanationsContainer.appendChild(div);
+        });
+
+        let selectedWord = null;
+
+        function handleWordClick(box, wordItem) {
+            if (selectedWord) {
+                selectedWord.box.classList.remove('selected');
+            }
+            selectedWord = { item: wordItem, box: box };
+            box.classList.add('selected');
+        }
+
+        function handleExplanationClick(explanationItem) {
+            if (selectedWord) {
+                if (selectedWord.item.explanation === explanationItem.explanation) {
+                    selectedWord.box.classList.add('matched');
+                    const index = [...explanationsContainer.children].findIndex(box => box.textContent === explanationItem.explanation);
+                    explanationsContainer.children[index].classList.add('matched');
+                    setTimeout(() => {
+                        selectedWord.box.remove();
+                        explanationsContainer.children[index].remove();
+                        reorderSquares();
+                    }, 500);
+                } else {
+                    alert("Incorrect match!");
+                    const explanationBox = [...explanationsContainer.children].find(box => box.textContent === explanationItem.explanation);
+                    explanationBox.classList.add('incorrect');
+                    setTimeout(() => {
+                        explanationBox.classList.remove('incorrect');
+                    }, 1000);
+                }
+                selectedWord.box.classList.remove('selected');
+                selectedWord = null;
+            }
+        }
+
+        function reorderSquares() {
+            const words = [...wordsContainer.children].sort(() => Math.random() - 0.5);
+            const explanations = [...explanationsContainer.children].sort(() => Math.random() - 0.5);
+
+            words.forEach(box => wordsContainer.appendChild(box));
+            explanations.forEach(box => explanationsContainer.appendChild(box));
+        }
+    </script>
+</body>
+</html>
