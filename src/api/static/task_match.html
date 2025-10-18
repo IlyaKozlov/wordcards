@@ -13,6 +13,7 @@
         .column {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
         .box {
             border: 1px solid #000;
@@ -22,10 +23,11 @@
             margin: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
-            max-width: 200px; /* Adjust as needed */
+            max-width: 200px;
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
+            width: 100%; /* Ensures boxes are the same width */
         }
         .matched {
             background-color: green;
@@ -44,10 +46,20 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="column" id="wordsContainer"></div>
-        <div class="column" id="explanationsContainer"></div>
+<div class="container">
+    <div class="column" id="wordsContainer">
+        <div class="box" id="word-1"></div>
+        <div class="box" id="word-2"></div>
+        <div class="box" id="word-3"></div>
+        <div class="box" id="word-4"></div>
     </div>
+    <div class="column" id="explanationsContainer">
+        <div class="box" id="explanation-1"></div>
+        <div class="box" id="explanation-2"></div>
+        <div class="box" id="explanation-3"></div>
+        <div class="box" id="explanation-4"></div>
+    </div>
+</div>
     <script>
         const task = JSON.parse(sessionStorage.getItem('task_content'));
         const data = [
@@ -72,21 +84,13 @@
         shuffle(explanations);
 
         data.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'box';
-            div.id = `word-${index + 1}`;
+            const div = document.getElementById(`word-${index + 1}`);
             div.innerHTML = `<span style="font-size: larger; font-weight: bold;">${item.word}</span>`;
             div.onclick = () => handleWordClick(div, item);
-            wordsContainer.appendChild(div);
-        });
 
-        explanations.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'box';
-            div.id = `explanation-${index + 1}`;
-            div.textContent = item.explanation;
-            div.onclick = () => handleExplanationClick(item);
-            explanationsContainer.appendChild(div);
+            const divExplanation = document.getElementById(`explanation-${index + 1}`);
+            divExplanation.textContent = item.explanation;
+            divExplanation.onclick = () => handleExplanationClick(item);
         });
 
         let selectedWord = null;
