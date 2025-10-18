@@ -4,38 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Learning App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            max-width: calc(66ch + 1em); /* 66 characters + some padding */
-            margin: 50px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 18px;
-        }
-
-        .highlight {
-            background-color: lightgreen;
-        }
-
-        .input-container {
-            display: inline;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
 
 
 <h1> task experimental word2explanation </h1>
+<p id="counter"></p>
+
+<div id="explanation" class="hidden"></div>
 
 <div id="word-explanation-game">
     <h2>Choose the correct explanation:</h2>
@@ -62,11 +40,28 @@
 
 <script>
 
+    let completed = sessionStorage.getItem('completed_tasks') || 0;
+    document.getElementById('counter').textContent = `Task №: ${completed}`;
+
     function delay(milliseconds){
         return new Promise(resolve => {
             setTimeout(resolve, milliseconds);
         });
     }
+
+    function loadWordExplanationGame() {
+        const data = JSON.parse(sessionStorage.getItem('task_content'));
+        document.getElementById('word-explanation-game').classList.remove('hidden');
+        document.getElementById('button1').textContent = data.word1;
+        document.getElementById('button2').textContent = data.word2;
+        document.getElementById('button3').textContent = data.word3;
+        document.getElementById('button4').textContent = data.word4;
+        document.getElementById('okButton').classList.add('hidden');
+        document.getElementById('taskPlaceholder').textContent = ''; // Clear any previous tasks
+        document.getElementById('taskPlaceholder').innerHTML = data.explanation;
+        return data.task_id;
+    }
+    let taskId = loadWordExplanationGame();
 
     async function checkAnswer(answer) {
         const formData = new FormData();
@@ -95,6 +90,10 @@
             document.getElementById('explanation').classList.remove('hidden');
             document.getElementById('explanation').innerHTML = explanation;
         }
+    }
+
+    function getNewTask() {
+        window.location.replace("/static/task_experimental.html");
     }
 
     function chooseAnswerKey(e) {

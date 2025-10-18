@@ -17,7 +17,7 @@ tasks = APIRouter()
 db = TaskDB()
 generator = TaskGenerator()
 
-htmls_path = Path(__file__).parent / "htmls"
+htmls_path = Path(__file__).parent.parent / "static"
 
 
 @tasks.get("/tasks")
