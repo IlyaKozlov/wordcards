@@ -14,6 +14,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+
+            justify-content: space-between; /* Added to distribute space evenly */
         }
         .box {
             border: 1px solid #000;
@@ -87,7 +89,9 @@
             const div = document.getElementById(`word-${index + 1}`);
             div.innerHTML = `<span style="font-size: larger; font-weight: bold;">${item.word}</span>`;
             div.onclick = () => handleWordClick(div, item);
-
+        });
+        shuffle(data)
+        data.forEach((item, index) => {
             const divExplanation = document.getElementById(`explanation-${index + 1}`);
             divExplanation.textContent = item.explanation;
             divExplanation.onclick = () => handleExplanationClick(item);
@@ -103,16 +107,30 @@
             box.classList.add('selected');
         }
 
+        function delay(milliseconds){
+            return new Promise(resolve => {
+                setTimeout(resolve, milliseconds);
+        });
+    }
+
+        function getNewTask() {
+            window.location.replace("/static/task_experimental.html");
+        }
+
         function reorderAfterMatch() {
             const matched = [...wordsContainer.children].filter(box => box.classList.contains('matched'));
             const nonMatched = [...wordsContainer.children].filter(box => !box.classList.contains('matched'));
             const explanationsMatched = [...explanationsContainer.children].filter(box => box.classList.contains('matched'));
             const explanationsNonMatched = [...explanationsContainer.children].filter(box => !box.classList.contains('matched'));
 
-            matched.forEach(box => wordsContainer.appendChild(box));
             nonMatched.forEach(box => wordsContainer.appendChild(box));
-            explanationsMatched.forEach(box => explanationsContainer.appendChild(box));
+            matched.forEach(box => wordsContainer.appendChild(box));
             explanationsNonMatched.forEach(box => explanationsContainer.appendChild(box));
+            explanationsMatched.forEach(box => explanationsContainer.appendChild(box));
+            if (matched.length === 4) {
+                delay(500);
+                getNewTask();
+            }
         }
 
         function handleExplanationClick(explanationItem) {

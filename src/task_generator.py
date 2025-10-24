@@ -18,9 +18,9 @@ class TaskGenerator:
 
     def new_task(self) -> Word2Explanation | SentenceWithPlaceholder:
         return random.choice([
-            # self._word2explanation,
-            # self._explanation2word,
-            # self._sentence_with_placeholder,
+            self._word2explanation,
+            self._explanation2word,
+            self._sentence_with_placeholder,
             self._match_word2explanation,
         ])()
 

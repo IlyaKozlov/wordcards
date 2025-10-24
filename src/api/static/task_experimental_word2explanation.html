@@ -43,11 +43,6 @@
     let completed = sessionStorage.getItem('completed_tasks') || 0;
     document.getElementById('counter').textContent = `Task №: ${completed}`;
 
-    function delay(milliseconds){
-        return new Promise(resolve => {
-            setTimeout(resolve, milliseconds);
-        });
-    }
 
     function loadWordExplanationGame() {
         const data = JSON.parse(sessionStorage.getItem('task_content'));
