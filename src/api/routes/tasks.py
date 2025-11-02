@@ -40,13 +40,6 @@ def check_answer(answer: str = Form(), task_id: str = Form(...)) -> TaskStatus:
 
 @tasks.get("")
 def task() -> HTMLResponse:
-    with open(Path(__file__).parent / "task.html", "r") as f:
-        code = f.read()
-    return HTMLResponse(code)
-
-
-@tasks.get("/task_experimental")
-def task_experimental() -> HTMLResponse:
     with open(htmls_path / "task_experimental.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)
