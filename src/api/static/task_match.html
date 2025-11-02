@@ -4,166 +4,234 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Match Words Game</title>
+    <link rel="stylesheet" href="/static/style.css">
     <style>
         .container {
             display: flex;
-            justify-content: center;
-            margin: 10px;
+            justify-content: space-between;
+            margin: 20px;
         }
-        .column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
 
-            justify-content: space-between; /* Added to distribute space evenly */
-        }
         .box {
+            width: 30%;
+            padding: 10px;
             border: 1px solid #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            max-width: 200px;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            white-space: normal;
-            width: 100%; /* Ensures boxes are the same width */
+            margin: 5px;
+            box-sizing: border-box;
         }
-        .matched {
-            background-color: green;
+
+        .box-large {
+            width: 65%;
         }
-        .incorrect {
-            background-color: red;
-            animation: flash 0.5s;
-        }
-        .selected {
-            background-color: lightgray;
-        }
-        @keyframes flash {
-            0% { background-color: red; }
-            100% { background-color: white; }
-        }
+
     </style>
 </head>
 <body>
+<h1> Match words </h1>
+<p id="counter"></p>
+
 <div class="container">
-    <div class="column" id="wordsContainer">
-        <div class="box" id="word-1"></div>
-        <div class="box" id="word-2"></div>
-        <div class="box" id="word-3"></div>
-        <div class="box" id="word-4"></div>
-    </div>
-    <div class="column" id="explanationsContainer">
-        <div class="box" id="explanation-1"></div>
-        <div class="box" id="explanation-2"></div>
-        <div class="box" id="explanation-3"></div>
-        <div class="box" id="explanation-4"></div>
-    </div>
+    <p> 1 </p>
+    <div class="box" id="word-0" onclick="selectWord(0)"></div>
+    <p> a </p>
+    <div class="box box-large" id="explanation-0" onclick="selectExplanation(0)"></div>
 </div>
-    <script>
-        const task = JSON.parse(sessionStorage.getItem('task_content'));
-        const data = [
-            { word: task.word1, explanation: task.explanation1},
-            { word: task.word2, explanation: task.explanation2},
-            { word: task.word3, explanation: task.explanation3},
-            { word: task.word4, explanation: task.explanation4}
-        ];
+<div class="container">
+    <p> 2 </p>
+    <div class="box" id="word-1" onclick="selectWord(1)"></div>
+    <p> b </p>
+    <div class="box box-large" id="explanation-1" onclick="selectExplanation(1)"></div>
+</div>
+<div class="container">
+    <p> 3 </p>
+    <div class="box" id="word-2" onclick="selectWord(2)"></div>
+    <p> c </p>
+    <div class="box box-large" id="explanation-2" onclick="selectExplanation(2)"></div>
+</div>
+<div class="container">
+    <p> 4 </p>
+    <div class="box" id="word-3" onclick="selectWord(3)"></div>
+    <p> d </p>
+    <div class="box box-large" id="explanation-3" onclick="selectExplanation(3)"></div>
+</div>
+<script>
 
-        const wordsContainer = document.getElementById('wordsContainer');
-        const explanationsContainer = document.getElementById('explanationsContainer');
+    let completed = sessionStorage.getItem('completed_tasks') || 0;
+    document.getElementById('counter').textContent = `Task №: ${completed}`;
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
+    let selectedWord = null;
+    let selectedExplanation = null;
+
+    const task = JSON.parse(sessionStorage.getItem('task_content'));
+    const data = [
+        {word: task.word1, explanation: task.explanation1, matched: false},
+        {word: task.word2, explanation: task.explanation2, matched: false},
+        {word: task.word3, explanation: task.explanation3, matched: false},
+        {word: task.word4, explanation: task.explanation4, matched: false}
+    ];
+
+
+    function chooseAnswerKey(e) {
+
+        if (e.key === '1') {
+            // call your function to do the thing
+            selectWord(0);
+        } else if (e.key === '2') {
+            // call your function to do the thing
+            selectWord(1);
+        } else if (e.key === '3') {
+            // call your function to do the thing
+            selectWord(2);
+        } else if (e.key === '4') {
+            // call your function to do the thing
+            selectWord(3);
+        } else if (e.key === 'a' || e.key === 'A' || e.key === 'ф' || e.key === 'Ф') {
+            // call your function to do the thing
+            selectExplanation(0);
+        } else if (e.key === 'b' || e.key === 'B' || e.key === 'и' || e.key === 'И') {
+            // call your function to do the thing
+            selectExplanation(1);
+        } else if (e.key === 'c' || e.key === 'C' || e.key === 'с' || e.key === 'С') {
+            // call your function to do the thing
+            selectExplanation(2);
+        } else if (e.key === 'd' || e.key === 'D' || e.key === 'в' || e.key === 'в') {
+            // call your function to do the thing
+            selectExplanation(3);
         }
+    }
+    document.addEventListener("keydown", chooseAnswerKey);
 
-        shuffle(data);
-        const explanations = [...data];
-        shuffle(explanations);
+    let box2word = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+    let box2explanation = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+    updateView();
 
-        data.forEach((item, index) => {
-            const div = document.getElementById(`word-${index + 1}`);
-            div.innerHTML = `<span style="font-size: larger; font-weight: bold;">${item.word}</span>`;
-            div.onclick = () => handleWordClick(div, item);
-        });
-        shuffle(data)
-        data.forEach((item, index) => {
-            const divExplanation = document.getElementById(`explanation-${index + 1}`);
-            divExplanation.textContent = item.explanation;
-            divExplanation.onclick = () => handleExplanationClick(item);
-        });
-
-        let selectedWord = null;
-
-        function handleWordClick(box, wordItem) {
-            if (selectedWord) {
-                selectedWord.box.classList.remove('selected');
-            }
-            selectedWord = { item: wordItem, box: box };
-            box.classList.add('selected');
+    function flashElement(element) {
+        const flashCount = 3; // Set the number of times to flash
+        for (let i = 0; i < flashCount; i++) {
+            setTimeout(() => {
+                element.style.backgroundColor = (i % 2 === 0) ? 'red' : 'white';
+            }, i * 300); // Change the timing as needed
         }
-
-        function delay(milliseconds){
-            return new Promise(resolve => {
-                setTimeout(resolve, milliseconds);
-        });
+        setTimeout(() => {
+            element.style.backgroundColor = 'white'; // Ensure it ends as white
+        }, flashCount * 300);
     }
 
-        function getNewTask() {
-            window.location.replace("/static/task_experimental.html");
-        }
+    function getNewTask() {
+        window.location.replace("/static/task_experimental.html");
+    }
 
-        function reorderAfterMatch() {
-            const matched = [...wordsContainer.children].filter(box => box.classList.contains('matched'));
-            const nonMatched = [...wordsContainer.children].filter(box => !box.classList.contains('matched'));
-            const explanationsMatched = [...explanationsContainer.children].filter(box => box.classList.contains('matched'));
-            const explanationsNonMatched = [...explanationsContainer.children].filter(box => !box.classList.contains('matched'));
+    function updateView() {
+        for (let i = 0; i < box2word.length; i++) {
+            const wordBox = document.getElementById(`word-${i}`);
+            const explanationBox = document.getElementById(`explanation-${i}`);
 
-            nonMatched.forEach(box => wordsContainer.appendChild(box));
-            matched.forEach(box => wordsContainer.appendChild(box));
-            explanationsNonMatched.forEach(box => explanationsContainer.appendChild(box));
-            explanationsMatched.forEach(box => explanationsContainer.appendChild(box));
-            if (matched.length === 4) {
-                delay(500);
-                getNewTask();
+            const wordId = box2word[i];
+            const explanationId = box2explanation[i];
+            wordBox.textContent = data[wordId].word;
+            explanationBox.innerHTML = data[explanationId].explanation;
+            if (data[wordId].matched) {
+                wordBox.style.backgroundColor = 'green';
+                explanationBox.style.backgroundColor = 'green';
+            } else {
+                wordBox.style.backgroundColor = 'white';
+                explanationBox.style.backgroundColor = 'white';
             }
         }
 
-        function handleExplanationClick(explanationItem) {
-            if (selectedWord) {
-                if (selectedWord.item.explanation === explanationItem.explanation) {
-                    selectedWord.box.classList.add('matched');
-                    const index = [...explanationsContainer.children].findIndex(box => box.textContent === explanationItem.explanation);
-                    explanationsContainer.children[index].classList.add('matched');
-                    setTimeout(() => {
-                        wordsContainer.appendChild(selectedWord.box);
-                        explanationsContainer.appendChild(explanationsContainer.children[index]);
-                        reorderSquares();
-                    }, 500);
-                    reorderAfterMatch();
-                } else {
-                    const explanationBox = [...explanationsContainer.children].find(box => box.textContent === explanationItem.explanation);
-                    explanationBox.classList.add('incorrect');
-                    setTimeout(() => {
-                        explanationBox.classList.remove('incorrect');
-                    }, 1000);
-                }
-                selectedWord.box.classList.remove('selected');
+        if (data.every(item => item.matched)) {
+            setTimeout(getNewTask, 200);
+        }
+
+    }
+
+    function match() {
+        const wordId = box2word[selectedWord];
+        const explanationId = box2explanation[selectedExplanation];
+        if (wordId === explanationId) {
+            const wordBox = document.getElementById(`word-${selectedWord}`);
+            const explanationBox = document.getElementById(`explanation-${selectedExplanation}`);
+            wordBox.style.backgroundColor = 'green';
+            explanationBox.style.backgroundColor = 'green';
+            data[wordId]["matched"] = true;
+            const word = data[wordId].word;
+            data[wordId].explanation = data[wordId].explanation.replace("***", `<b>${word}</b>`);
+
+            selectedWord = null;
+            selectedExplanation = null;
+
+            box2word = box2word.sort((a, b) => data[a]["matched"] - data[b]["matched"]);
+            box2explanation = box2explanation.sort((a, b) => data[a]["matched"] - data[b]["matched"]);
+            setTimeout(updateView, 200);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function selectWord(id) {
+        // check if already matched
+        if (data[box2word[id]].matched) {
+            // nothing to do
+            return;
+        }
+
+        const newElement = document.getElementById(`word-${id}`);
+        if (selectedWord === id) {
+            // unselect
+            newElement.style.backgroundColor = 'white';
+            selectedWord = null;
+            return;
+        }
+        if (selectedWord !== null) {
+            const oldElement = document.getElementById(`word-${selectedWord}`);
+            oldElement.style.backgroundColor = 'white';
+        }
+        selectedWord = id;
+        newElement.style.backgroundColor = 'lightgray';
+
+        if (selectedExplanation !== null) {
+            const matched = match();
+            if (!matched) {
                 selectedWord = null;
+                flashElement(newElement);
+                newElement.style.backgroundColor = 'white';
             }
         }
+    }
 
-        function reorderSquares() {
-            const words = [...wordsContainer.children].sort(() => Math.random() - 0.5);
-            const explanations = [...explanationsContainer.children].sort(() => Math.random() - 0.5);
 
-            words.forEach(box => wordsContainer.appendChild(box));
-            explanations.forEach(box => explanationsContainer.appendChild(box));
+    function selectExplanation(id) {
+        if (data[box2explanation[id]].matched) {
+            // nothing to do
+            return;
         }
-    </script>
+        const newElement = document.getElementById(`explanation-${id}`);
+        if (selectedExplanation === id) {
+            // unselect
+            newElement.style.backgroundColor = 'white';
+            selectedExplanation = null;
+            return;
+        }
+        if (selectedExplanation !== null) {
+            const oldElement = document.getElementById(`explanation-${selectedExplanation}`);
+            oldElement.style.backgroundColor = 'white';
+        }
+        selectedExplanation = id;
+        newElement.style.backgroundColor = 'lightgray';
+
+        if (selectedWord !== null) {
+            const matched = match();
+            if (!matched) {
+                selectedExplanation = null;
+                flashElement(newElement);
+                newElement.style.backgroundColor = 'white';
+            }
+        }
+    }
+
+
+</script>
 </body>
 </html>

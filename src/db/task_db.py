@@ -1,6 +1,7 @@
 import json
 import random
 import time
+from http.client import HTTPException
 from typing import List, Optional, Dict
 from uuid import UUID
 
@@ -23,6 +24,8 @@ class TaskDB(Database):
         for word in words:
             explanation = random.choice(data[word])
             result.append(WordExplanation.model_validate(explanation))
+        if result is None or len(result) != 4:
+            raise HTTPException("Not enough items to fetch new task")
         return result
 
     def update_task_statistic(self, word: str, is_correct: bool) -> None:

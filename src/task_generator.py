@@ -22,9 +22,29 @@ class TaskGenerator:
             self._explanation2word,
             self._sentence_with_placeholder,
             self._match_word2explanation,
+            self._match_word2sentence,
         ])()
 
-    def _match_word2explanation(self) -> MatchWordExplanation:
+    def _match_word2sentence(self) -> MatchWordExplanation:
+        items, task_id = self._match_word2()
+        self.logger.info("Generated task explanation2word")
+        sentences = [
+            random.choice(item.sentences_with_placeholder).replace("PLACEHOLDER", "***")
+             for item in items
+        ]
+        return MatchWordExplanation(
+            task_id=task_id,
+            word1=items[0].word,
+            explanation1=sentences[0],
+            word2=items[1].word,
+            explanation2=sentences[1],
+            word3=items[2].word,
+            explanation3=sentences[2],
+            word4=items[3].word,
+            explanation4=sentences[3],
+        )
+
+    def _match_word2(self):
         items = self.db.get_four_words()
         if items is None or len(items) != 4:
             raise HTTPException("Not enough items to fetch new task")
@@ -35,6 +55,10 @@ class TaskGenerator:
             explanation="",
             right_answer="ok",
         )
+        return items, task_id
+
+    def _match_word2explanation(self) -> MatchWordExplanation:
+        items, task_id = self._match_word2()
         self.logger.info("Generated task explanation2word")
         return MatchWordExplanation(
             task_id=task_id,
@@ -50,8 +74,6 @@ class TaskGenerator:
 
     def _explanation2word(self) -> Word2Explanation:
         items = self.db.get_four_words()
-        if items is None or len(items) != 4:
-            raise HTTPException("Not enough items to fetch new task")
         right_answer_id = random.choice(range(len(items)))
         task_id = str(uuid.uuid4())
         self.db.save_task(

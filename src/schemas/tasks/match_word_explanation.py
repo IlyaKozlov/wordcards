@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
 class MatchWordExplanation(BaseModel):
+    task_id: str
+
     word1: str
     explanation1: str
 
