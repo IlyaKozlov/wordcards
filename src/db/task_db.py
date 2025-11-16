@@ -15,7 +15,7 @@ class TaskDB(Database):
     _task_statistic_path = Database._directory_path / "tasks_statistic.json"
 
     def get_four_words(self) -> Optional[List[WordExplanation]]:
-        with open(self._path_existing) as file:
+        with open(self._path_learning) as file:
             data: dict = json.load(file)
         if len(data) < 4:
             return None

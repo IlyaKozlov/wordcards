@@ -25,25 +25,3 @@ class GenerateWordExplanation:
             d["word"] = word
             result.append(WordExplanation.model_validate(d))
         return result
-
-
-if __name__ == '__main__':
-    from dotenv import load_dotenv
-    from tqdm import tqdm
-
-    load_dotenv("/home/padre/rojects/learn/wordcards/.env")
-
-    path = "/home/padre/rojects/learn/wordcards/db/existing_words.json"
-    path_tmp = "/home/padre/rojects/learn/wordcards/db/existing_words.json.tmp"
-    with open(path, "r") as f:
-        existing_words = json.load(f)
-    res = {}
-    generator = GenerateWordExplanation()
-    for word in tqdm(existing_words):
-        explanation = generator.generate_word_explanation(word)
-        for expl in explanation:
-            if word not in res:
-                res[word] = []
-            res[word].append(expl.model_dump())
-    with open(path_tmp, "w") as f:
-        json.dump(obj=res, fp=f, indent=4, ensure_ascii=False)

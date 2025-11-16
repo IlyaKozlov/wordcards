@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class DedocManager:
 
-    max_size = 16000
+    max_size = 4096
 
     def handle(self, file: Path) -> List[str]:
         url = os.path.join(os.getenv("DEDOC_URL", "http://localhost:1231"), "upload")

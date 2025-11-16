@@ -1,10 +1,8 @@
-import json
 import logging
 
 from db.dictionary import Dictionary
 from db.words_cnt import WordsCounter
 from generator.generate_word_explanation import GenerateWordExplanation
-from paths import path_new
 
 logger = logging.getLogger(__name__)
 

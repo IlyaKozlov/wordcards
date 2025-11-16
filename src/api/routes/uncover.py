@@ -1,4 +1,3 @@
-import json
 import logging
 from pathlib import Path
 
@@ -11,7 +10,6 @@ from tqdm import tqdm
 from db.word_db import WordDB
 from generator.generate_word_explanation import GenerateWordExplanation
 from generator.translator import Translator
-from paths import path_existing, path_known
 from schemas.word_with_explanation import WordWithExplanation
 from schemas.words_statistic import WordsStatistic
 

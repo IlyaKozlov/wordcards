@@ -8,9 +8,9 @@ from typing import List, Dict
 class Database(abc.ABC):
     _directory_path = Path(__file__).parent.parent.parent / "db"
 
-    _path_existing = _directory_path / "existing_words.json"
+    _path_learning = _directory_path / "learning_words.json"
     _path_known = _directory_path / "known_words.json"
-    _path_new = _directory_path / "new_words.json"
+    _path_all_words = _directory_path / "all_words.json"
 
     @staticmethod
     def save_object(obj: List | Dict, path: Path) -> None:

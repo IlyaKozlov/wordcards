@@ -1,4 +1,3 @@
-import json
 import tempfile
 from collections import Counter
 from pathlib import Path
@@ -7,10 +6,10 @@ from fastapi import UploadFile, File
 from fastapi.routing import APIRouter
 from tqdm import tqdm
 
+from db.word_db import WordDB
 from dedoc_manager import DedocManager
-from llm.llm_model import LLMModel
 from generator.page_to_normalized import PageToNormalized
-from paths import path_new
+from llm.llm_model import LLMModel
 
 add_words = APIRouter()
 
@@ -26,14 +25,14 @@ def add_book(file: UploadFile = File()) -> str:
         pages = dm.handle(file=file_path)
 
     normalizer = PageToNormalized(llm_model=LLMModel.from_env())
-    with open(path_new, "r") as file:
-        all_words = json.load(file)
+    all_words = Counter()
     for page in tqdm(pages):
         if not page:
             continue
         normalized_page = normalizer.normalize_page(page)
         for word in normalized_page.lower().split():
-            all_words[word] = 1 + all_words.get(word, 0)
-    with open(path_new, "w") as file:
-        json.dump(obj=Counter(all_words), fp=file, indent=4)
-    return "Ok"
+            all_words[word] += 1
+
+    word_db = WordDB()
+    word_db.update_existing_words(all_words)
+    return f"Add {sum(all_words.values()):,d} ({len(all_words):,d} unique) words"
