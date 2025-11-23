@@ -2,6 +2,7 @@ import logging
 import random
 import uuid
 from http.client import HTTPException
+from typing import Optional
 
 from db.task_db import TaskDB
 from schemas.tasks.match_word_explanation import MatchWordExplanation
@@ -15,15 +16,18 @@ class TaskGenerator:
     def __init__(self):
         self.db = TaskDB()
         self.logger = logging.getLogger(__name__)
+        self._tasks_generators = {
+            "Word2Explanation": [self._word2explanation, self._explanation2word],
+            "SentenceWithPlaceholder": [self._sentence_with_placeholder],
+            "MatchWordExplanation": [self._match_word2explanation, self._match_word2sentence],
+        }
 
-    def new_task(self) -> Word2Explanation | SentenceWithPlaceholder:
-        return random.choice([
-            self._word2explanation,
-            self._explanation2word,
-            self._sentence_with_placeholder,
-            self._match_word2explanation,
-            self._match_word2sentence,
-        ])()
+    def new_task(self, task_type: Optional[str] = None) -> Word2Explanation | SentenceWithPlaceholder:
+        if task_type is None:
+            generators = [gen for item in self._tasks_generators.values() for gen in item]
+        else:
+            generators = self._tasks_generators.get(task_type)
+        return random.choice(generators)()
 
     def _match_word2sentence(self) -> MatchWordExplanation:
         items, task_id = self._match_word2()

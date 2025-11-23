@@ -12,12 +12,18 @@
     <script>
 
         async function getNewTask() {
-            const response = await fetch('/tasks/tasks');
-            if (!response.ok) {
-                console.error("Failed to fetch new task");
-                return;
+            let data = sessionStorage.getItem("next_task_content");
+            if (data == null) {
+                const response = await fetch('/tasks/tasks');
+                if (!response.ok) {
+                    console.error("Failed to fetch new task");
+                    return;
+                }
+                data = await response.json();
+            } else {
+                data = JSON.parse(data);
             }
-            const data = await response.json();
+
             await sessionStorage.setItem("task_content", JSON.stringify(data));
             let taskType = data.task_type; // Get the task type
             if (taskType === "Word2Explanation") {
@@ -25,8 +31,11 @@
             }
             else if (taskType === "MatchWordExplanation") {
                 window.location.replace("/static/task_match.html");
-            } else {
-                window.location.replace("/static/task_experimental_other.html");
+            } else if (taskType === "SentenceWithPlaceholder") {
+                window.location.replace("/static/task_typing.html");
+            }
+            else {
+                alert(`Unknow task type ${taskType}`);
             }
         }
 

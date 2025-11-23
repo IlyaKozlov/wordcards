@@ -38,14 +38,13 @@
     <button id="okButton" class="hidden" onclick="getNewTask()">OK</button>
 </div>
 
+
+<script src="/static/taskCounter.js"></script>
 <script>
-
-    let completed = sessionStorage.getItem('completed_tasks') || 0;
-    document.getElementById('counter').textContent = `Task №: ${completed}`;
-
+    fetchNewTask();
 
     function loadWordExplanationGame() {
-        const data = JSON.parse(sessionStorage.getItem('task_content'));
+        const data = getTaskContent("Word2Explanation");
         document.getElementById('word-explanation-game').classList.remove('hidden');
         document.getElementById('button1').textContent = data.word1;
         document.getElementById('button2').textContent = data.word2;
@@ -85,10 +84,6 @@
             document.getElementById('explanation').classList.remove('hidden');
             document.getElementById('explanation').innerHTML = explanation;
         }
-    }
-
-    function getNewTask() {
-        window.location.replace("/static/task_experimental.html");
     }
 
     function chooseAnswerKey(e) {

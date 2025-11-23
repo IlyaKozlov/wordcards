@@ -20,11 +20,10 @@
     <div id="message"></div>
 </div>
 
+<script src="/static/taskCounter.js"></script>
 <script>
+    fetchNewTask();
     let taskId;
-
-    let completed = sessionStorage.getItem('completed_tasks') || 0;
-    document.getElementById('counter').textContent = `Task №: ${completed}`;
 
     async function checkAnswer(answer) {
         const formData = new FormData();
@@ -54,8 +53,8 @@
         }
     }
 
-    function loadTypeTextGame() {
-        const data = JSON.parse(sessionStorage.getItem('task_content'));
+    async function loadTypeTextGame() {
+        const data = await getTaskContent("SentenceWithPlaceholder");
         taskId = data.task_id;
 
         const hiddenWord = data.word; // Assuming `data.word` contains the word to be guessed

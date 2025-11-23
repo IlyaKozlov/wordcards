@@ -54,22 +54,28 @@
     <p> d </p>
     <div class="box box-large" id="explanation-3" onclick="selectExplanation(3)"></div>
 </div>
-<script>
 
-    let completed = sessionStorage.getItem('completed_tasks') || 0;
-    document.getElementById('counter').textContent = `Task №: ${completed}`;
+<script src="/static/taskCounter.js"></script>
+<script>
 
     let selectedWord = null;
     let selectedExplanation = null;
 
-    const task = JSON.parse(sessionStorage.getItem('task_content'));
-    const data = [
-        {word: task.word1, explanation: task.explanation1, matched: false},
-        {word: task.word2, explanation: task.explanation2, matched: false},
-        {word: task.word3, explanation: task.explanation3, matched: false},
-        {word: task.word4, explanation: task.explanation4, matched: false}
-    ];
+    fetchNewTask();
 
+
+    function loadTask() {
+
+        const task = getTaskContent("MatchWordExplanation");
+        return [
+            {word: task.word1, explanation: task.explanation1, matched: false},
+            {word: task.word2, explanation: task.explanation2, matched: false},
+            {word: task.word3, explanation: task.explanation3, matched: false},
+            {word: task.word4, explanation: task.explanation4, matched: false}
+        ];
+    }
+
+    let data = loadTask();
 
     function chooseAnswerKey(e) {
 
