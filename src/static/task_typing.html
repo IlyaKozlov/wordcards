@@ -15,7 +15,7 @@
     <h2>Type the Hidden Word</h2>
     <div id="sentence-container"></div>
     <p>
-        <button id="submit-button-word-type" onclick=getNewTask()>Help</button>
+        <button id="submit-button-word-type" onclick=showHiddenWord()>Help</button>
     </p>
     <div id="message"></div>
 </div>
@@ -43,7 +43,7 @@
         const result = await response.json();
         if (result.is_true) {
             // Correct answer, get a new task
-            getNewTask();
+            setTimeout(getNewTask, 2000);
         } else {
             // Incorrect answer, show explanation
             let explanation = result.explanation;
@@ -60,8 +60,10 @@
         const hiddenWord = data.word; // Assuming `data.word` contains the word to be guessed
         document.getElementById('type-text-game').classList.remove('hidden');
         const placeholder = "PLACEHOLDER";
+        let explanation = data.explanation;
+        explanation = explanation.replace("***", `<u class="hint" id="spoiler" onclick="showHiddenWord()">${hiddenWord}</u>`);
         let sentenceWithInput = "";
-        sentenceWithInput += `<p><details> <summary>${data.word_part}</summary>  ${data.explanation} </details> </p>`;
+        sentenceWithInput += `<div style="border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; margin-bottom: 10px;">${explanation}</div>`;
         sentenceWithInput += data.sentence.replace(
             placeholder,
             `<input type="text" id="input-field-hidden-word" autocomplete="off" placeholder=${data.word_part} class="input-container" />`
@@ -78,32 +80,30 @@
             const remainingText = hiddenWord.substring(commonPrefixLength);
 
             // Highlight the common prefix
-            const highlightedWord = `<span class="highlight">${highlightedText}</span>` + "*".repeat(remainingText.length);
+            const highlightedWord = `<span id="displayWord" class="highlight">${highlightedText}</span>` + "*".repeat(remainingText.length);
             this.style.borderColor = (userInput === hiddenWord) ? 'green' : 'red';
             document.getElementById('message').innerHTML = highlightedWord;
 
             // Check if the user input matches the hidden word
             if (userInput.toLowerCase() === hiddenWord.toLowerCase()) {
-                alert(`Word matched! It is "${hiddenWord}"`);
-                checkAnswer(userInput.toLowerCase());
+                const displayWord = document.getElementById('displayWord');
+                displayWord.classList.add('flicker');
+
                 document.getElementById('message').innerHTML = "You typed the correct word!";
                 document.getElementById('message').innerHTML = "";
+                checkAnswer(userInput.toLowerCase());
+
             }
         });
 
         document.getElementById('submit-button-word-type').onclick = function () {
             const userInput = inputField.value;
             if (userInput.toLowerCase() === hiddenWord.toLowerCase()) {
-                alert(`It is "${hiddenWord}"`);
-                getNewTask();
+                setTimeout(getNewTask, 2000);
             } else {
                 alert(`It is "${hiddenWord}"`);
             }
         };
-    }
-
-    function getNewTask() {
-        window.location.replace("/static/task_experimental.html");
     }
 
     function getCommonPrefixLength(str1, str2) {

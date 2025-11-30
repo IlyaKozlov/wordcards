@@ -12,13 +12,35 @@ const taskUrl = '/tasks/tasks';
 
 function getTaskContent(taskType) {
     let taskContent = sessionStorage.getItem('task_content');
-
-    if (taskContent == null) {
-        const url = new URL(taskUrl, window.location.origin);
-        url.searchParams.append('task_type', taskType);
-        taskContent = fetch(url).text;
+    let taskContentParsed = null;
+    try {
+        taskContentParsed = JSON.parse(taskContent);
+    } catch (Exception) {
+        console.log(Exception.message);
+        taskContent = null;
     }
-    return JSON.parse(taskContent);
+
+    if (taskContentParsed !== null) {
+        return taskContentParsed;
+    }
+
+    console.log(
+        'Task content is null. Fetching new task from server...'
+    )
+
+    const url = new URL(taskUrl, window.location.origin);
+    url.searchParams.append('task_type', taskType);
+    return fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json(); // Return JSON data
+        })
+        .catch(error => {
+          alert('An error occurred: ' + error.message); // Raise alert on error
+          return null; // Return null or handle as needed
+        });
 }
 
 
@@ -30,3 +52,15 @@ async function fetchNewTask() {
     });
 }
 
+function showHiddenWord() {
+    const spoiler = document.getElementById("spoiler");
+
+    // Show the hidden word
+    spoiler.classList.remove("hint")
+    spoiler.classList.add("hintUnravel")
+
+    // Hide the word again after 5 seconds
+    setTimeout(() => {
+        spoiler.classList.remove("hint");
+    }, 5000);
+}

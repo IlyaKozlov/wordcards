@@ -42,9 +42,10 @@
 <script src="/static/taskCounter.js"></script>
 <script>
     fetchNewTask();
+    let taskId = null;
 
-    function loadWordExplanationGame() {
-        const data = getTaskContent("Word2Explanation");
+    async function loadWordExplanationGame() {
+        const data = await getTaskContent("Word2Explanation");
         document.getElementById('word-explanation-game').classList.remove('hidden');
         document.getElementById('button1').textContent = data.word1;
         document.getElementById('button2').textContent = data.word2;
@@ -53,9 +54,9 @@
         document.getElementById('okButton').classList.add('hidden');
         document.getElementById('taskPlaceholder').textContent = ''; // Clear any previous tasks
         document.getElementById('taskPlaceholder').innerHTML = data.explanation;
-        return data.task_id;
+        taskId = data.task_id;
     }
-    let taskId = loadWordExplanationGame();
+    loadWordExplanationGame();
 
     async function checkAnswer(answer) {
         const formData = new FormData();
