@@ -46,20 +46,20 @@ def check_answer(answer: str = Form(), task_id: str = Form(...)) -> TaskStatus:
 
 @tasks.get("")
 def task() -> HTMLResponse:
-    with open(htmls_path / "task_experimental.html", "r") as f:
+    with open(htmls_path / "task.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)
 
 
-@tasks.get("/task_experimental_word2explanation")
-def task_experimental() -> HTMLResponse:
-    with open(htmls_path / "task_experimental_word2explanation.html", "r") as f:
+@tasks.get("/task_word2explanation")
+def task() -> HTMLResponse:
+    with open(htmls_path / "task_word2explanation.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)
 
 
-@tasks.get("/task_experimental_other")
-def task_experimental_other() -> HTMLResponse:
+@tasks.get("/task_other")
+def task_other() -> HTMLResponse:
     with open(htmls_path / "task_typing.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)

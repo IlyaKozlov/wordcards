@@ -14,13 +14,21 @@
     <label for="word">Enter a word or phrase:</label><br>
     <textarea id="word" name="word" cols="66" rows="5"></textarea>
     <br>
-    <button type="submit">Translate</button>
+    <button id="OkButton" type="submit">Translate</button>
 </form>
 
 
 <div id="output"></div>
 
 <script>
+
+    document.getElementById('translateForm').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent the default behavior
+            document.getElementById('OkButton').click();
+        }
+    });
+
     function toggleHint(element) {
         element.classList.remove("hint")
         element.classList.add("hintUnravel")
@@ -32,6 +40,10 @@
         const word = document.getElementById('word').value;
         const outputDiv = document.getElementById('output');
 
+        if (word.trim() === "") {
+            outputDiv.innerHTML = 'Please enter something'; // Initial message
+            return;
+        }
         outputDiv.innerHTML = 'Wait a bit...'; // Initial message
 
         const response = await fetch('/translate/translate', {

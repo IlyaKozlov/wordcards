@@ -27,7 +27,7 @@
             await sessionStorage.setItem("task_content", JSON.stringify(data));
             let taskType = data.task_type; // Get the task type
             if (taskType === "Word2Explanation") {
-                window.location.replace("/static/task_experimental_word2explanation.html");
+                window.location.replace("/static/task_word2explanation.html");
             }
             else if (taskType === "MatchWordExplanation") {
                 window.location.replace("/static/task_match.html");
