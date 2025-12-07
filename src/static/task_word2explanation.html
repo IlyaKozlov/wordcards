@@ -81,9 +81,16 @@
         } else {
             // Incorrect answer, show explanation
             let explanation = result.explanation;
-            explanation += `<p> <button onclick="getNewTask()">OK</button> <p>`;
+            explanation += `<p> <button onclick="getNewTask()" onkeydown="getNewTaskKeyDown()" >OK</button> <p>`;
             document.getElementById('explanation').classList.remove('hidden');
             document.getElementById('explanation').innerHTML = explanation;
+            document.addEventListener("keydown", getNewTaskKeyDown);
+        }
+    }
+
+    function getNewTaskKeyDown(e) {
+        if (e.key === "Enter") {
+            getNewTask();
         }
     }
 

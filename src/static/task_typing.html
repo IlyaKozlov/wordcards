@@ -14,9 +14,6 @@
 <div id="type-text-game" class="hidden">
     <h2>Type the Hidden Word</h2>
     <div id="sentence-container"></div>
-    <p>
-        <button id="submit-button-word-type" onclick=showHiddenWord()>Help</button>
-    </p>
     <div id="message"></div>
 </div>
 
@@ -37,20 +34,9 @@
 
         if (!response.ok) {
             console.error("Failed to check answer");
-            return;
         }
 
-        const result = await response.json();
-        if (result.is_true) {
-            // Correct answer, get a new task
-            setTimeout(getNewTask, 2000);
-        } else {
-            // Incorrect answer, show explanation
-            let explanation = result.explanation;
-            explanation += `<p> <button onclick="getNewTask()">OK</button> <p>`;
-            document.getElementById('explanation').classList.remove('hidden');
-            document.getElementById('explanation').innerHTML = explanation;
-        }
+        setTimeout(getNewTask, 1000);
     }
 
     async function loadTypeTextGame() {
@@ -62,13 +48,22 @@
         const placeholder = "PLACEHOLDER";
         let explanation = data.explanation;
         explanation = explanation.replace("***", `<u class="hint" id="spoiler" onclick="showHiddenWord()">${hiddenWord}</u>`);
-        let sentenceWithInput = "";
-        sentenceWithInput += `<div style="border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; margin-bottom: 10px;">${explanation}</div>`;
-        sentenceWithInput += data.sentence.replace(
-            placeholder,
-            `<input type="text" id="input-field-hidden-word" autocomplete="off" placeholder=${data.word_part} class="input-container" />`
-        );
-        document.getElementById('sentence-container').innerHTML = sentenceWithInput;
+
+        const explanationHTML = `
+            <div style="border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; margin-bottom: 10px;">
+                ${explanation}
+            </div>`;
+
+        let hiddenWordForm = `<code id="hiddenWord"> ${data.word_part} </code>`;
+        let sentenceWithHiddenWord = `
+            ${data.sentence.replace(placeholder, `${hiddenWordForm}`)}
+        `;
+
+        // Move the input field to the bottom
+        const inputFieldHTML = `<p> <input type="text" id="input-field-hidden-word" autocomplete="off" placeholder=${data.word_part} class="input-container" /> </p>`;
+        document.getElementById('sentence-container').innerHTML = explanationHTML;
+        document.getElementById('sentence-container').innerHTML += sentenceWithHiddenWord;
+        document.getElementById('sentence-container').insertAdjacentHTML('beforeend', inputFieldHTML);
         document.getElementById("input-field-hidden-word").select();
 
         const inputField = document.getElementById('input-field-hidden-word');
@@ -77,12 +72,12 @@
             const userInput = this.value.toLowerCase();
             const commonPrefixLength = getCommonPrefixLength(userInput, hiddenWord);
             const highlightedText = hiddenWord.substring(0, commonPrefixLength).toLowerCase();
-            const remainingText = hiddenWord.substring(commonPrefixLength);
+            const remainingText = data.word_part.substring(commonPrefixLength);
 
             // Highlight the common prefix
-            const highlightedWord = `<span id="displayWord" class="highlight">${highlightedText}</span>` + "*".repeat(remainingText.length);
+            const highlightedWord = `<span id="displayWord" class="highlight">${highlightedText}</span>` + remainingText;
             this.style.borderColor = (userInput === hiddenWord) ? 'green' : 'red';
-            document.getElementById('message').innerHTML = highlightedWord;
+            document.getElementById('hiddenWord').innerHTML = highlightedWord;
 
             // Check if the user input matches the hidden word
             if (userInput.toLowerCase() === hiddenWord.toLowerCase()) {
@@ -92,7 +87,6 @@
                 document.getElementById('message').innerHTML = "You typed the correct word!";
                 document.getElementById('message').innerHTML = "";
                 checkAnswer(userInput.toLowerCase());
-
             }
         });
 

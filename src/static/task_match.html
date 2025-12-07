@@ -64,18 +64,30 @@
     fetchNewTask();
 
 
-    function loadTask() {
+    function isTaskValid(task) {
+        return task.word1 !== null && task.word2 !== null &&
+               task.word3 !== null && task.word4 !== null &&
+               task.explanation1 !== null && task.explanation2 !== null &&
+               task.explanation3 !== null && task.explanation4 !== null;
+    }
+    let data = null;
+    let box2word = null;
+    let box2explanation = null;
+    async function loadTask() {
 
-        const task = getTaskContent("MatchWordExplanation");
-        return [
+        const task = await getTaskContent("MatchWordExplanation", isTaskValid);
+        data = [
             {word: task.word1, explanation: task.explanation1, matched: false},
             {word: task.word2, explanation: task.explanation2, matched: false},
             {word: task.word3, explanation: task.explanation3, matched: false},
             {word: task.word4, explanation: task.explanation4, matched: false}
         ];
+        box2word = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+        box2explanation = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+        updateView();
     }
 
-    let data = loadTask();
+    loadTask();
 
     function chooseAnswerKey(e) {
 
@@ -107,9 +119,6 @@
     }
     document.addEventListener("keydown", chooseAnswerKey);
 
-    let box2word = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-    let box2explanation = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-    updateView();
 
     function flashElement(element) {
         const flashCount = 3; // Set the number of times to flash

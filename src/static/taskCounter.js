@@ -10,11 +10,17 @@ function getNewTask() {
 const taskUrl = '/tasks/tasks';
 
 
-function getTaskContent(taskType) {
+function getTaskContent(taskType, verificationFunction=null) {
     let taskContent = sessionStorage.getItem('task_content');
     let taskContentParsed = null;
     try {
         taskContentParsed = JSON.parse(taskContent);
+        if (verificationFunction !== null && !verificationFunction(taskContentParsed)) {
+            taskContentParsed = null;
+        }
+        console.log(
+            'Task content is invalid. Fetching new task from server...'
+        )
     } catch (Exception) {
         console.log(Exception.message);
         taskContent = null;
