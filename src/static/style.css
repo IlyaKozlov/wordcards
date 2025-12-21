@@ -1,56 +1,159 @@
 [tooltip]:active::after {
     content: attr(tooltip);
 }
-body {
-    font-family: Arial, sans-serif;
-    max-width: calc(66ch + 1em); /* 66 characters + some padding */
-    margin: 0 auto; /* Center the text block */
-    padding: 1em;
-    line-height: 1.5; /* Optional: improve readability */
+
+/* Main image (default hidden on mid/large screens; shown/positioned via media queries) */
+#main-rat {
+    display: none;
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    width: 150px;
+    height: auto;
+    cursor: pointer;
+    z-index: 1000;
+    pointer-events: auto;
 }
+/* Page base styles */
+body {
+    margin: 0 auto;
+    padding: 1em;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f8f9fa;
+    color: #212529;
+    max-width: calc(66ch + 1em); /* keep readable measure for content */
+    line-height: 1.5;
+}
+
+/* Basic navigation styling (default: horizontal top nav for small/medium screens) */
+nav {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+}
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+nav li {
+    margin: 0;
+}
+nav a {
+    color: #0f172a;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    display: inline-block;
+}
+nav a:hover,
+nav a:focus {
+    background: #eef2ff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+}
+
+/* On wider screens, show vertical menu positioned below the fixed image */
+@media (min-width: 1024px) {
+    #main-rat {
+        display: block;
+    }
+    nav {
+        position: fixed;
+        left: 20px;
+        top: calc(20px + 150px + 12px);
+        width: 160px;
+        background: rgba(255,255,255,0.95);
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.5rem;
+        z-index: 999;
+    }
+    nav ul {
+        display: block;
+        padding: 0;
+    }
+    nav li {
+        margin: 0.25rem 0;
+    }
+    nav a {
+        display: block;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Small-screen main rat (phones): show a smaller image fixed in the right corner */
+@media (max-width: 600px) {
+    #main-rat {
+        display: block;
+        right: 12px;
+        left: auto;
+        bottom: 12px;
+        top: auto;
+        width: 64px;
+        height: auto;
+        position: fixed;
+        z-index: 1000;
+    cursor: pointer;
+        pointer-events: auto;
+}
+
+    /* Keep the nav layout suitable for small screens (prevent overlap) */
+    nav {
+        position: relative;
+        left: auto;
+        top: auto;
+        width: auto;
+    }
+}
+
+/* Output area */
 #output {
     margin-top: 20px;
     white-space: pre-wrap;
 }
-.hint {
+
+/* Hint / revealable content */
+.hint,
+.hintUnravel {
     background-color: #ddd;
     display: inline-block;
     padding: 8px 12px;
     position: relative;
-    cursor: pointer; /* Change cursor to indicate it's clickable */
+    cursor: pointer;
+    border-radius: 6px;
+    user-select: text;
 }
 
+/* Concealed state */
 .hint:not(.active) {
     background-color: #eee;
     color: #eee;
     min-width: 96px;
     user-select: none;
 }
-
 .hint:not(.active)::before {
     position: absolute;
     top: 8px;
     left: 12px;
-    content: 'Click to reveal'; /* non-breaking spaces probably necessary */
+    content: 'Click to reveal';
     color: #999;
+    pointer-events: none;
 }
 
-.hintUnravel {
-    background-color: #ddd;
-    display: inline-block;
-    padding: 8px 12px;
-    position: relative;
-}
-
+/* Hidden content inside hint elements */
 .hidden-content {
     display: none; /* Initially hidden */
 }
-
 .hint.active .hidden-content {
-    display: inline; /* Show content when active */
-    color: #000; /* Change color to visible */
+    display: inline; /* Show content when hint has .active */
+    color: #000;
 }
 
+/* Utility & other components */
 .hidden {
     display: none;
 }
@@ -59,22 +162,39 @@ body {
     margin: 10px;
     padding: 10px 20px;
     font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .highlight {
     background-color: lightgreen;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
 }
 
 .input-container {
     display: inline;
 }
 
-
+/* Flicker animation */
 @keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.flicker {
+    animation: flicker 0.5s linear infinite;
 }
 
-.flicker {
-  animation: flicker 0.5s linear infinite;
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .flicker {
+        animation: none;
+    }
 }

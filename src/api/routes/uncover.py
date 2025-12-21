@@ -27,22 +27,6 @@ def html_form() -> HTMLResponse:
     return HTMLResponse(content=code)
 
 
-@uncover.get("/translate_all")
-def translate_in_advance(min_cnt: str = Query(default="10")) -> str:
-    words = database.get_new_words(min_cnt=int(min_cnt))
-    translator = Translator()
-    for w in tqdm(words):
-        logger.info(f"translate word in advance '{w}'")
-        translator.translate(w, update_cnt=False)
-        logger.info(f"translate word in advance done '{w}'")
-        logger.info(
-            f"cache miss rate:"
-            f" {translator.cache_miss_cnt / translator.call_cnt:0.2f} "
-            f"({translator.cache_miss_cnt} of {translator.call_cnt})"
-        )
-    return f"translated {len(words)} words"
-
-
 @uncover.post("/save_word")
 def save_word(word: str = Form(), *, background_tasks: BackgroundTasks) -> str:
     def save():

@@ -4,7 +4,7 @@ from pathlib import Path
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -37,8 +37,10 @@ app.include_router(tasks, prefix="/tasks", tags=["tasks"])
 
 
 @app.get("/")
-def root():
-    return "Hi"
+def root() -> HTMLResponse:
+    with open(static_path / "main.html") as out:
+        code = out.read()
+    return HTMLResponse(code)
 
 
 @app.get("/favicon.ico")
