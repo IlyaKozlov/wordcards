@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 
 class WordExplanation(BaseModel):
+    hits: int = 0
     word: str
     meaning: str
     explanation: str
@@ -28,4 +29,7 @@ class WordExplanation(BaseModel):
 
     @staticmethod
     def _replace_underscore(string: str, replacement: str) -> str:
-        return re.sub(r"_[^_]+_", replacement, string)
+        result = re.sub(r"_[^_]+_", replacement, string)
+        if replacement not in result:
+            result += f" ({replacement})"
+        return result

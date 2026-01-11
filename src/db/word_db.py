@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Dict
 from collections import Counter
 
 from db.db_abc import Database
@@ -35,6 +35,11 @@ class WordDB(Database):
         with open(self._path_known) as file:
             ls = json.load(file)
         return len(ls)
+
+    def get_learning_words(self) -> Dict[str, list]:
+        with open(self._path_learning) as file:
+            learning_word_data = json.load(file)
+        return learning_word_data
 
     def save_word_explanation(self, word: str, explanations: List[WordExplanation]) -> None:
         with open(self._path_learning) as f:

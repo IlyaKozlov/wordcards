@@ -168,6 +168,28 @@ nav a:focus {
     color: white;
     cursor: pointer;
 }
+.buttonRight {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    background: darkgreen;
+    color: white;
+    cursor: pointer;
+}
+
+.buttonWrong {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    background: red;
+    color: white;
+    cursor: pointer;
+}
+
 .button:disabled {
     opacity: 0.6;
     cursor: not-allowed;

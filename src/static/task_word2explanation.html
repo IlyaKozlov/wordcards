@@ -13,7 +13,6 @@
 <h1> task word2explanation </h1>
 <p id="counter"></p>
 
-<div id="explanation" class="hidden"></div>
 
 <div id="word-explanation-game">
     <h2>Choose the correct explanation:</h2>
@@ -36,6 +35,7 @@
 
 
     <button id="okButton" class="hidden" onclick="getNewTask()">OK</button>
+    <div id="explanation" class="hidden"></div>
 </div>
 <a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
 
@@ -43,6 +43,9 @@
 <script>
     fetchNewTask();
     let taskId = null;
+    let targetWord = null;
+    let rightAnswerId = null;
+    let explanation = null;
 
     async function loadWordExplanationGame() {
         const data = await getTaskContent("Word2Explanation");
@@ -55,33 +58,29 @@
         document.getElementById('taskPlaceholder').textContent = ''; // Clear any previous tasks
         document.getElementById('taskPlaceholder').innerHTML = data.explanation;
         taskId = data.task_id;
+        rightAnswerId = data.right_answer_id;
+        targetWord = data.target_word;
     }
     loadWordExplanationGame();
 
     async function checkAnswer(answer) {
-        const formData = new FormData();
-        formData.append('answer', answer.toString());
-        formData.append('task_id', taskId);
+        const isTrue = (answer === rightAnswerId);
+        updateTaskStatistics([[targetWord, isTrue]]);
+        const answerElement = document.getElementById(`button${answer}`);
+        const rightAnswerElement = document.getElementById(`button${rightAnswerId}`);
 
-        const response = await fetch('/tasks/check', {
-            method: 'POST',
-            body: formData,
-        });
+        rightAnswerElement.classList.remove('button')
+        rightAnswerElement.classList.add('buttonRight');
 
-        if (!response.ok) {
-            console.error("Failed to check answer");
-            return;
-        }
-
-        const result = await response.json();
-        document.getElementById('word-explanation-game').classList.add('hidden');
-        if (result.is_true) {
+        if (isTrue) {
             // Correct answer, get a new task
-            getNewTask();
+            setTimeout(getNewTask, 800);
         } else {
             // Incorrect answer, show explanation
-            let explanation = result.explanation;
-            explanation += `<p> <button onclick="getNewTask()" onkeydown="getNewTaskKeyDown()" >OK</button> <p>`;
+            answerElement.classList.remove('button')
+            answerElement.classList.add('buttonWrong')
+
+            let explanation = `<p> <button onclick="getNewTask()">OK</button> <p>`;
             document.getElementById('explanation').classList.remove('hidden');
             document.getElementById('explanation').innerHTML = explanation;
             document.addEventListener("keydown", getNewTaskKeyDown);

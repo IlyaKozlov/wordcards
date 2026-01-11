@@ -134,6 +134,9 @@
     }
 
     function getNewTask() {
+        const answer = data.map(d => [d.word, true]);
+        console.log(answer);
+        updateTaskStatistics(answer);
         window.location.replace("/static/task.html");
     }
 

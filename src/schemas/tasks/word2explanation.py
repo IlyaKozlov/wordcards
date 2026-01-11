@@ -8,4 +8,6 @@ class Word2Explanation(BaseModel):
     word2: str
     word3: str
     word4: str
+    target_word: str
+    right_answer_id: int
     task_type: str = "Word2Explanation"

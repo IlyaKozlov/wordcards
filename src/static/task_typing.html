@@ -24,19 +24,7 @@
     let taskId;
 
     async function checkAnswer(answer) {
-        const formData = new FormData();
-        formData.append('answer', answer.toString());
-        formData.append('task_id', taskId);
-
-        const response = await fetch('/tasks/check', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            console.error("Failed to check answer");
-        }
-
+        updateTaskStatistics([[answer.lower, true]]);
         setTimeout(getNewTask, 1000);
     }
 

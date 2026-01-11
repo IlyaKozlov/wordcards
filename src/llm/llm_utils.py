@@ -21,3 +21,20 @@ def get_hash(text: str) -> UUID:
     calculator = hashlib.md5()
     calculator.update(text.encode("utf-8"))
     return UUID(calculator.hexdigest())
+
+def fix_json(text: str, model: "LLMModel", error: Exception) -> str:
+    prompt = f"""
+    I've tried to read a json (see below) but got an error, please try to fix it 
+    
+    Exception:
+    ```
+    {error}
+    ```
+    
+    Json:
+    ```
+    {text}
+    ```    
+    """
+    answer = model.invoke(prompt)
+    return answer

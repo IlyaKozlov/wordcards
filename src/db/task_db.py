@@ -8,21 +8,28 @@ from uuid import UUID
 from db.db_abc import Database
 from schemas.tasks.task_answer import TaskAnswer
 from schemas.word_explanation import WordExplanation
+from schemas.word_statistic import WordStatistic
 
 
 class TaskDB(Database):
     _task_path = Database._directory_path / "tasks.json"
     _task_statistic_path = Database._directory_path / "tasks_statistic.json"
 
-    def get_four_words(self) -> Optional[List[WordExplanation]]:
-        with open(self._path_learning) as file:
+    def get_four_words(
+            self,
+            words: Optional[List[str]] = None,
+    ) -> Optional[List[WordExplanation]]:
+        with open(self._path_learning) as file, open(self._task_statistic_path) as statistic_file:
             data: dict = json.load(file)
+            statistics = json.load(statistic_file)
         if len(data) < 4:
             return None
-        words = random.sample(list(data.keys()), 4)
+        if words is None:
+            words = random.sample(list(data.keys()), 4)
         result = []
         for word in words:
             explanation = random.choice(data[word])
+            explanation["hits"] = statistics.get(word, {}).get("hits", 0)
             result.append(WordExplanation.model_validate(explanation))
         if result is None or len(result) != 4:
             raise HTTPException("Not enough items to fetch new task")
@@ -44,11 +51,11 @@ class TaskDB(Database):
         self.save_object(data, self._task_statistic_path)
 
     def save_task(
-            self,
-            task_id: UUID | str,
-            right_answer: str,
-            word: str,
-            explanation: str,
+        self,
+        task_id: UUID | str,
+        right_answer: str,
+        word: str,
+        explanation: str,
     ) -> None:
         task_id = str(task_id)
         data = self._get_data()
@@ -75,3 +82,22 @@ class TaskDB(Database):
     def get_task(self, task_id: UUID | str) -> Optional[TaskAnswer]:
         task_id = str(task_id)
         return TaskAnswer.model_validate(self._get_data()[task_id])
+
+    def get_words_statistics(self) -> List[WordStatistic]:
+        with open(self._task_statistic_path) as statistic_file, open(
+            self._path_learning
+        ) as words_file:
+            statistics: dict = json.load(statistic_file)
+            words: dict = json.load(words_file)
+        result = []
+        for word in sorted(words.keys()):
+            statistic = statistics.get(word, {"hits": 0, "misses": 0, "correct": 0})
+            result.append(
+                WordStatistic(
+                    word=word,
+                    hits=statistic.get("hits", 0),
+                    misses=statistic.get("misses", 0),
+                    correct=statistic.get("correct", 0),
+                )
+            )
+        return result

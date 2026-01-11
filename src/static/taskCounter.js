@@ -9,6 +9,39 @@ function getNewTask() {
 
 const taskUrl = '/tasks/tasks';
 
+function updateTaskStatistics(wordTuples) {
+    // Accepts an array of tuples: [[word1, true], [word2, false], ...]
+    if (!Array.isArray(wordTuples) || wordTuples.length === 0) {
+        return Promise.resolve(null);
+    }
+    const statistics = wordTuples.map(tuple => {
+        if (!Array.isArray(tuple)) {
+            // ignore malformed entries
+            return null;
+        }
+        const word = tuple.length > 0 ? String(tuple[0]) : '';
+        const is_true = tuple.length > 1 ? !!tuple[1] : false;
+        return {word, is_true};
+    }).filter(Boolean);
+    const payload = {statistics};
+    return fetch('/tasks/update_statistics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Failed to update task statistics:', error);
+            return null;
+        });
+}
+
 
 function getTaskContent(taskType, verificationFunction=null) {
     let taskContent = sessionStorage.getItem('task_content');
@@ -70,3 +103,4 @@ function showHiddenWord() {
         spoiler.classList.remove("hint");
     }, 5000);
 }
+

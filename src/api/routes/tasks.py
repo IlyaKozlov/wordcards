@@ -1,21 +1,16 @@
-import random
-import time
-import uuid
-from http.client import HTTPException
 from pathlib import Path
 from typing import Optional
-from tqdm import tqdm
 
-from fastapi import Form, Query
+from fastapi import Query
 from fastapi.routing import APIRouter
 from starlette.responses import HTMLResponse
 
 from db.task_db import TaskDB
 from schemas.tasks.match_word_explanation import MatchWordExplanation
 from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
-from schemas.tasks.task_status import TaskStatus
 from schemas.tasks.word2explanation import Word2Explanation
-from task_generator import TaskGenerator
+from schemas.tasks.word_statistics_update import WordsStatisticUpdate
+from generator.tasks.task_generator import TaskGenerator
 
 tasks = APIRouter()
 db = TaskDB()
@@ -33,15 +28,15 @@ def get_new_task(
     return generator.new_task(task_type)
 
 
-@tasks.post("/check")
-def check_answer(answer: str = Form(), task_id: str = Form(...)) -> TaskStatus:
-    status = db.get_task(task_id=task_id)
-    if status.right_answer == answer:
-        db.update_task_statistic(word=status.word, is_correct=True)
-        return TaskStatus(is_true=True, explanation="")
-    else:
-        db.update_task_statistic(word=status.word, is_correct=False)
-        return TaskStatus(is_true=False, explanation=status.explanation)
+@tasks.post("/update_statistics")
+def update_statistics(statistics: WordsStatisticUpdate) -> str:
+    for word in statistics:
+        db.update_task_statistic(
+            word=word.word,
+            is_correct=word.is_true,
+        )
+
+    return "ok"
 
 
 @tasks.get("")

@@ -10,6 +10,7 @@ from tqdm import tqdm
 from api.routes.uncover import database
 from db.word_db import WordDB
 from dedoc_manager import DedocManager
+from generator.generate_word_explanation import GenerateWordExplanation
 from generator.page_to_normalized import PageToNormalized
 from generator.translator import Translator
 from llm.llm_model import LLMModel
@@ -56,3 +57,14 @@ def translate_in_advance(min_cnt: str = Query(default="10")) -> str:
             f"({translator.cache_miss_cnt} of {translator.call_cnt})"
         )
     return f"translated {len(words)} words"
+
+
+@add_words.get("/fix_learning_words")
+def translate_in_advance() -> str:
+    words = database.get_learning_words()
+    broken = [k for k, v in words.items() if len(v) == 0]
+    generator = GenerateWordExplanation()
+    for w in tqdm(broken, desc="Fix word explanation"):
+        explanation = generator.generate_word_explanation(w)
+        database.save_word_explanation(w, explanation)
+    return f"fix {len(broken)} words"

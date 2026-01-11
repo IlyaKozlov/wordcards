@@ -16,7 +16,7 @@ def setup_logging():
     root_logger = logging.getLogger()
     handler = logging.StreamHandler(sys.stderr)
     logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-
-    root_logger.addHandler(handler)
+    if len(root_logger.handlers) == 0:
+        root_logger.addHandler(handler)
 
     root_logger.setLevel(logging.INFO)
