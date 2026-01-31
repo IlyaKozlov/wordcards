@@ -7,14 +7,14 @@ import time
 
 class LLMCache:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.db_filename = (
             Path(__file__).parent.parent.parent / "db" / "llm_cache.sqlite"
         )
         self.create_table()
         self.logger = logging.getLogger(__name__)
 
-    def create_table(self):
+    def create_table(self) -> None:
         with sqlite3.connect(self.db_filename) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -28,7 +28,7 @@ class LLMCache:
             )
             conn.commit()
 
-    def put(self, key: uuid.UUID, value: str):
+    def put(self, key: uuid.UUID, value: str) -> None:
         with sqlite3.connect(self.db_filename) as conn:
             cursor = conn.cursor()
             ts = int(time.time())
@@ -61,7 +61,7 @@ class LLMCache:
                 self.logger.info(f"Not found in cache {key}")
             return row[0] if row else None
 
-    def clear(self, max_storage_time: float):
+    def clear(self, max_storage_time: float) -> None:
         threshold_time = time.time() - max_storage_time
         with sqlite3.connect(self.db_filename) as conn:
             cursor = conn.cursor()

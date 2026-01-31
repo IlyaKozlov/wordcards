@@ -1,12 +1,9 @@
-import json
 import logging
 import os
 from pathlib import Path
 from typing import List
 
 import requests
-
-from llm.llm_model import LLMModel
 
 logger = logging.getLogger(__name__)
 

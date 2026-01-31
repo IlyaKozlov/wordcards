@@ -21,4 +21,3 @@ class TaskWords(BaseModel):
             self.word3,
             self.word4,
         ]
-

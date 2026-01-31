@@ -33,7 +33,7 @@ def save_word(
 ) -> str:
     database = WordDB(uid)
 
-    def save():
+    def save() -> None:
         logger.info(f"Start saving word {word}")
         database.save_word_explanation(word, [])
         generator = GenerateWordExplanation()

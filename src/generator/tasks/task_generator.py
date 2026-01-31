@@ -15,7 +15,7 @@ from schemas.word_explanation import WordExplanation
 
 class TaskGenerator:
 
-    def __init__(self, user_id: str):
+    def __init__(self, user_id: str) -> None:
         self.db = TaskDB(user_id)
         self.word_sampler = TaskWordsSampler(self.db)
         self.logger = logging.getLogger(__name__)

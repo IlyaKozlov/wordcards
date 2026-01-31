@@ -48,7 +48,7 @@ def task(uid: str = Query(), ) -> HTMLResponse:
 
 
 @tasks.get("/task_word2explanation")
-def task(uid: str = Query(), ) -> HTMLResponse:
+def task_word2explanation(uid: str = Query(), ) -> HTMLResponse:
     with open(htmls_path / "task_word2explanation.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)

@@ -4,8 +4,6 @@ from json import JSONDecodeError
 from pathlib import Path
 from typing import List
 
-from pydantic.v1 import JsonError
-
 from llm.llm_model import LLMModel
 from llm.llm_utils import get_code_blocs, fix_json
 from schemas.word_explanation import WordExplanation
@@ -13,7 +11,7 @@ from schemas.word_explanation import WordExplanation
 
 class GenerateWordExplanation:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.model = LLMModel.from_env()
         self.logger = logging.getLogger(__name__)
 

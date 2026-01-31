@@ -9,8 +9,10 @@ from typing import List, Dict
 
 class Database(abc.ABC):
 
-
-    def __init__(self, user_id: str,):
+    def __init__(
+        self,
+        user_id: str,
+    ) -> None:
         super().__init__()
 
         self._directory_path = Path(__file__).parent.parent.parent / "db" / user_id
@@ -20,10 +22,11 @@ class Database(abc.ABC):
         self._path_known = self._directory_path / "known_words.json"
         self._path_all_words = self._directory_path / "all_words.json"
 
-        for path, obj in ((self._path_known, []),
-                          (self._path_learning, {}),
-                          (self._path_all_words, {}),
-                          ):
+        for path, obj in (
+            (self._path_known, []),
+            (self._path_learning, {}),
+            (self._path_all_words, {}),
+        ):
             if not path.exists():
                 self.save_object(obj, path)
 

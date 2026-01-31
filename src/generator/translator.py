@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class Translator:
 
-    def __init__(self, user_id: Optional[str]):
+    def __init__(self, user_id: Optional[str]) -> None:
         self.cache_miss_cnt = 0
         self.call_cnt = 0
         self.dictionary = Dictionary()

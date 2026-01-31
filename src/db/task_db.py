@@ -14,13 +14,10 @@ from schemas.word_statistic import WordStatistic
 
 class TaskDB(Database):
 
-
-    def __init__(self, user_id: str):
+    def __init__(self, user_id: str) -> None:
         super().__init__(user_id)
         self._task_path = self._directory_path / "tasks.json"
         self._task_statistic_path = self._directory_path / "tasks_statistic.json"
-
-
 
     def get_four_words(
         self,

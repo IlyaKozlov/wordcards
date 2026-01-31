@@ -12,7 +12,11 @@ logger = logging.getLogger(__name__)
 
 class TranslatorStream:
 
-    def __init__(self, model: LLMModel, user_id: Optional[str]=None,) -> None:
+    def __init__(
+        self,
+        model: LLMModel,
+        user_id: Optional[str] = None,
+    ) -> None:
         self.model = model
         self._cyrillic = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
         self._latin = "abcdefghijklmnopqrstuvwxyz"
@@ -68,7 +72,7 @@ class TranslatorStream:
         cyrillic_cnt = sum(letter in self._cyrillic for letter in message)
         return latin_cnt, cyrillic_cnt, word_cnt
 
-    def _translate_en_ru(self, message: str):
+    def _translate_en_ru(self, message: str) -> Iterable[Chunk]:
         message = message.strip()
         with open(self._templates / "translate_en_ru.txt") as f:
             template = f.read()
@@ -92,7 +96,7 @@ class TranslatorStream:
                 for w in words:
                     self.counter.put(w, weight=1)
 
-    def _translate_ru_en(self, message: str):
+    def _translate_ru_en(self, message: str) -> Iterable[Chunk]:
         with open(self._templates / "translate_ru_en.txt") as f:
             template = f.read()
         prompt = template.format(message=message)

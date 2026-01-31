@@ -22,7 +22,8 @@ def get_hash(text: str) -> UUID:
     calculator.update(text.encode("utf-8"))
     return UUID(calculator.hexdigest())
 
-def fix_json(text: str, model: "LLMModel", error: Exception) -> str:
+
+def fix_json(text: str, model: "LLMModel", error: Exception) -> str:  # noqa F821
     prompt = f"""
     I've tried to read a json (see below) but got an error, please try to fix it 
     

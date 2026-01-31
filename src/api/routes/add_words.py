@@ -66,7 +66,7 @@ def translate_in_advance(
 
 
 @add_words.get("/fix_learning_words")
-def translate_in_advance(
+def fix_learning_words(
     uid: str = Query(),
 ) -> str:
     database = WordDB(uid)

@@ -67,9 +67,9 @@ the algorithm be optimize the by calculate the iteration need in
 the the function generate data from various model
 
 
-TEXT: 
+TEXT:
 
 ```
 {text}
-``` 
+```
 """

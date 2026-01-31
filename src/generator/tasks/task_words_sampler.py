@@ -2,9 +2,7 @@ import heapq
 import logging
 import random
 import uuid
-from typing import Optional, Counter, List
-
-import numpy as np
+from typing import Optional, List
 
 from db.task_db import TaskDB
 from generator.tasks.task_words import TaskWords
@@ -13,7 +11,7 @@ from schemas.word_statistic import WordStatistic
 
 class TaskWordsSampler:
 
-    def __init__(self, db: TaskDB):
+    def __init__(self, db: TaskDB) -> None:
         super().__init__()
         self.db = db
         self._weight = 5

@@ -6,9 +6,11 @@ from typing import Optional
 
 class Dictionary:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.path = Path(__file__).parent.parent.parent / "db" / "dictionary.json"
-        self.path_tmp = Path(__file__).parent.parent.parent / "db" / "dictionary.json.tmp"
+        self.path_tmp = (
+            Path(__file__).parent.parent.parent / "db" / "dictionary.json.tmp"
+        )
 
     def get(self, word: str) -> Optional[str]:
         word = self._to_key(word)
@@ -28,5 +30,3 @@ class Dictionary:
     @staticmethod
     def _to_key(word: str) -> str:
         return word.strip().lower()
-
-
