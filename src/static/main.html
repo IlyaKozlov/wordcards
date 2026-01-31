@@ -6,18 +6,56 @@
     <title>Wordcards</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
+<script src="/static/commonUtils.js"></script>
+
 <body>
 <nav>
     <ul>
-        <li><a href="/tasks">Training</a></li>
-        <li><a href="/uncover">Uncover</a></li>
-        <li><a href="/static/vocabulary_extend.html">Book upload</a></li>
-        <li><a href="/translate">Translate</a></li>
-        <li><a href="/docs">Help</a></li>
+        <li><a id="training-link" href="/tasks">Training</a></li>
+        <li><a id="uncover-link" href="/static/uncover_form.html">Uncover</a></li>
+        <li><a id="book-upload-link" href="/static/vocabulary_extend.html">Book upload</a></li>
+        <li><a id="translate-link" href="/translate">Translate</a></li>
+        <li><a id="login-link" href="/static/login.html">Login</a></li>
+        <li><a id="help-link" href="/docs">Help</a></li>
     </ul>
 </nav>
 
 <a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
 
 </body>
+<script>
+
+    const uid = getUid();
+    if (uid == null) {
+        const elementIds = ["training-link", "uncover-link", "book-upload-link"];
+        elementIds.forEach(id => {
+            const element = document.getElementById(id);
+            console.log(element);
+            if (element) {
+                element.style.pointerEvents = 'none';
+                element.style.opacity = '0.5';
+            }
+        });
+    }
+    else {
+        const elementIds = [
+            "training-link",
+            "uncover-link",
+            "book-upload-link",
+            "translate-link",
+            "login-link"
+        ];
+        elementIds.forEach(id =>
+{
+            const element = document.getElementById(id);
+            if (element) {
+                const href = element.getAttribute('href') || '';
+                const sep = href.includes('?') ? '&' : '?';
+                element.setAttribute('href', href + sep + 'uid=' + encodeURIComponent(uid));
+            }
+        }
+        )
+    }
+</script>
 </html>

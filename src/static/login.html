@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<form id="loginForm" style="display:flex;gap:8px;align-items:center;justify-content:center;margin-top:20vh;">
+    <label for="uid" style="font-family:inherit;">User ID</label>
+    <input id="uid" name="uid" type="text" autocomplete="off" style="padding:6px 8px;font-size:16px;" />
+    <button type="submit" id="okBtn" style="padding:6px 12px;font-size:16px;">OK</button>
+</form>
+
+<script>
+(function() {
+    const form = document.getElementById('loginForm');
+    const input = document.getElementById('uid');
+    const okBtn = document.getElementById('okBtn');
+
+    function openUid() {
+        const val = input.value || '';
+        const url = '/static/main.html?uid=' + encodeURIComponent(val);
+        window.open(url, '_blank');
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        openUid();
+    });
+
+    // Ensure Enter triggers the OK button
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            okBtn.click();
+        }
+    });
+
+    input.focus();
+})();
+</script>
+</body>
+</html>

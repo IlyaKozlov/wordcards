@@ -8,13 +8,18 @@
     <title>Title</title>
 </head>
 <body>
-
+    <script src="/static/commonUtils.js"></script>
     <script>
+
+        const uid = getUid();
+        if (uid == null) {
+            window.location.replace("/static/login.html");
+        }
 
         async function getNewTask() {
             let data = sessionStorage.getItem("next_task_content");
             if (data == null) {
-                const response = await fetch('/tasks/tasks');
+                const response = await fetch('/tasks/tasks' + "?uid=" + encodeURIComponent(uid));
                 if (!response.ok) {
                     console.error("Failed to fetch new task");
                     return;
@@ -26,17 +31,24 @@
 
             await sessionStorage.setItem("task_content", JSON.stringify(data));
             let taskType = data.task_type; // Get the task type
+            let url;
             if (taskType === "Word2Explanation") {
-                window.location.replace("/static/task_word2explanation.html");
+                url = "/static/task_word2explanation.html";
             }
             else if (taskType === "MatchWordExplanation") {
-                window.location.replace("/static/task_match.html");
+                url = "/static/task_match.html";
             } else if (taskType === "SentenceWithPlaceholder") {
-                window.location.replace("/static/task_typing.html");
+                url = "/static/task_typing.html";
+            } else if (taskType === "NoNewWords") {
+                url = "/static/no_new_words.html";
             }
             else {
+                url = "/static/task_match.html"
                 alert(`Unknow task type ${taskType}`);
             }
+            url = url + "?uid=" + encodeURIComponent(uid);
+            window.location.replace(url);
+
         }
 
         let cnt = parseInt(sessionStorage.getItem("completed_tasks")) || 0;
