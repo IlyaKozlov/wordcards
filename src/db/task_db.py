@@ -7,19 +7,25 @@ from uuid import UUID
 
 from db.db_abc import Database
 from schemas.tasks.task_answer import TaskAnswer
+from schemas.tasks.word_statistics_update import WordsStatisticUpdate
 from schemas.word_explanation import WordExplanation
 from schemas.word_statistic import WordStatistic
 
 
 class TaskDB(Database):
-    _task_path = Database._directory_path / "tasks.json"
-    _task_statistic_path = Database._directory_path / "tasks_statistic.json"
+
+    def __init__(self, user_id: str) -> None:
+        super().__init__(user_id)
+        self._task_path = self._directory_path / "tasks.json"
+        self._task_statistic_path = self._directory_path / "tasks_statistic.json"
 
     def get_four_words(
-            self,
-            words: Optional[List[str]] = None,
+        self,
+        words: Optional[List[str]] = None,
     ) -> Optional[List[WordExplanation]]:
-        with open(self._path_learning) as file, open(self._task_statistic_path) as statistic_file:
+        with open(self._path_learning) as file, open(
+            self._task_statistic_path
+        ) as statistic_file:
             data: dict = json.load(file)
             statistics = json.load(statistic_file)
         if len(data) < 4:
@@ -35,19 +41,25 @@ class TaskDB(Database):
             raise HTTPException("Not enough items to fetch new task")
         return result
 
-    def update_task_statistic(self, word: str, is_correct: bool) -> None:
+    def update_task_statistic(
+        self,
+        statistics: WordsStatisticUpdate,
+    ) -> None:
         if self._task_statistic_path.exists():
             with open(self._task_statistic_path) as file:
                 data: dict = json.load(file)
         else:
             data = {}
-        item = data.get(word, {"hits": 0, "misses": 0, "correct": 0})
-        if is_correct:
-            item["correct"] += 1
-        else:
-            item["misses"] += 1
-        item["hits"] += 1
-        data[word] = item
+        for word_update in statistics.statistics:
+            word = word_update.word
+            is_correct = word_update.is_true
+            item = data.get(word, {"hits": 0, "misses": 0, "correct": 0})
+            if is_correct:
+                item["correct"] += 1
+            else:
+                item["misses"] += 1
+            item["hits"] += 1
+            data[word] = item
         self.save_object(data, self._task_statistic_path)
 
     def save_task(
@@ -84,6 +96,8 @@ class TaskDB(Database):
         return TaskAnswer.model_validate(self._get_data()[task_id])
 
     def get_words_statistics(self) -> List[WordStatistic]:
+        if not self._task_statistic_path.exists():
+            self.save_object({}, self._task_statistic_path)
         with open(self._task_statistic_path) as statistic_file, open(
             self._path_learning
         ) as words_file:

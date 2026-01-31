@@ -9,6 +9,7 @@ class WordStatisticUpdate(BaseModel):
 
 
 class WordsStatisticUpdate(BaseModel):
+    user_id: str
     statistics: List[WordStatisticUpdate]
 
     def __iter__(self) -> Iterator[WordStatisticUpdate]:

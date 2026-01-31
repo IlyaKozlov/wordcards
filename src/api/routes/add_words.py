@@ -7,7 +7,6 @@ from fastapi import UploadFile, File, Query
 from fastapi.routing import APIRouter
 from tqdm import tqdm
 
-from api.routes.uncover import database
 from db.word_db import WordDB
 from dedoc_manager import DedocManager
 from generator.generate_word_explanation import GenerateWordExplanation
@@ -20,7 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 @add_words.post("/add_book")
-def add_book(file: UploadFile = File()) -> str:
+def add_book(
+    uid: str = Query(),
+    file: UploadFile = File(),
+) -> str:
     dm = DedocManager()
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
@@ -38,15 +40,19 @@ def add_book(file: UploadFile = File()) -> str:
         for word in normalized_page.lower().split():
             all_words[word] += 1
 
-    word_db = WordDB()
+    word_db = WordDB(uid)
     word_db.update_existing_words(all_words)
     return f"Add {sum(all_words.values()):,d} ({len(all_words):,d} unique) words"
 
 
 @add_words.get("/translate_all")
-def translate_in_advance(min_cnt: str = Query(default="10")) -> str:
+def translate_in_advance(
+    uid: str = Query(),
+    min_cnt: str = Query(default="10"),
+) -> str:
+    database = WordDB(uid)
     words = database.get_new_words(min_cnt=int(min_cnt))
-    translator = Translator()
+    translator = Translator(uid)
     for w in tqdm(words):
         logger.info(f"translate word in advance '{w}'")
         translator.translate(w, update_cnt=False)
@@ -60,7 +66,10 @@ def translate_in_advance(min_cnt: str = Query(default="10")) -> str:
 
 
 @add_words.get("/fix_learning_words")
-def translate_in_advance() -> str:
+def fix_learning_words(
+    uid: str = Query(),
+) -> str:
+    database = WordDB(uid)
     words = database.get_learning_words()
     broken = [k for k, v in words.items() if len(v) == 0]
     generator = GenerateWordExplanation()

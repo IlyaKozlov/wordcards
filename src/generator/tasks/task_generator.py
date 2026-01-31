@@ -7,6 +7,7 @@ from db.task_db import TaskDB
 from generator.tasks.task_words import TaskWords
 from generator.tasks.task_words_sampler import TaskWordsSampler
 from schemas.tasks.match_word_explanation import MatchWordExplanation
+from schemas.tasks.no_new_words import NoNewWords
 from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
 from schemas.tasks.word2explanation import Word2Explanation
 from schemas.word_explanation import WordExplanation
@@ -14,8 +15,8 @@ from schemas.word_explanation import WordExplanation
 
 class TaskGenerator:
 
-    def __init__(self):
-        self.db = TaskDB()
+    def __init__(self, user_id: str) -> None:
+        self.db = TaskDB(user_id)
         self.word_sampler = TaskWordsSampler(self.db)
         self.logger = logging.getLogger(__name__)
         self._tasks_generators = {
@@ -35,8 +36,10 @@ class TaskGenerator:
     def new_task(
         self,
         task_type: Optional[str] = None,
-    ) -> Word2Explanation | SentenceWithPlaceholder:
+    ) -> Word2Explanation | SentenceWithPlaceholder | NoNewWords:
         words = self.word_sampler.four_words()
+        if words is None:
+            return NoNewWords()
         if task_type is not None:
             generators = self._tasks_generators.get(task_type)
         elif min(word.hits for word in words.words) <= 2:

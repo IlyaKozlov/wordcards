@@ -1,13 +1,15 @@
+const uid = getUid();
+
 let completed = sessionStorage.getItem('completed_tasks') || 0;
 document.getElementById('counter').textContent = `Task №: ${completed}`;
 
 
 
 function getNewTask() {
-    window.location.replace("/static/task.html");
+    window.location.replace("/static/task.html" + "?uid=" + encodeURIComponent(uid));
 }
 
-const taskUrl = '/tasks/tasks';
+const taskUrl = '/tasks/tasks' + "?uid=" + encodeURIComponent(uid);
 
 function updateTaskStatistics(wordTuples) {
     // Accepts an array of tuples: [[word1, true], [word2, false], ...]
@@ -24,7 +26,7 @@ function updateTaskStatistics(wordTuples) {
         return {word, is_true};
     }).filter(Boolean);
     const payload = {statistics};
-    return fetch('/tasks/update_statistics', {
+    return fetch('/tasks/update_statistics' + "?uid=" + encodeURIComponent(uid), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -69,6 +71,7 @@ function getTaskContent(taskType, verificationFunction=null) {
 
     const url = new URL(taskUrl, window.location.origin);
     url.searchParams.append('task_type', taskType);
+    url.searchParams.append('uid', uid);
     return fetch(url)
         .then(response => {
           if (!response.ok) {
@@ -103,4 +106,3 @@ function showHiddenWord() {
         spoiler.classList.remove("hint");
     }, 5000);
 }
-

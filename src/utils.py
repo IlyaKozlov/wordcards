@@ -12,7 +12,7 @@ def is_word(word: str) -> bool:
     return True
 
 
-def setup_logging():
+def setup_logging() -> None:
     root_logger = logging.getLogger()
     handler = logging.StreamHandler(sys.stderr)
     logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')

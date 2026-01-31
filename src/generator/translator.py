@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from db.dictionary import Dictionary
 from db.words_cnt import WordsCounter
@@ -9,11 +10,12 @@ logger = logging.getLogger(__name__)
 
 class Translator:
 
-    def __init__(self):
+    def __init__(self, user_id: Optional[str]) -> None:
         self.cache_miss_cnt = 0
         self.call_cnt = 0
         self.dictionary = Dictionary()
-        self.counter = WordsCounter()
+        if user_id:
+            self.counter = WordsCounter(user_id)
 
     def translate(self, word: str, update_cnt: bool = True) -> str:
         self.call_cnt += 1
@@ -27,7 +29,7 @@ class Translator:
                 translation += f"{explanation.explanation}\n"
                 translation += f"{explanation.translation}\n"
             self.dictionary.put(word, translation)
-        if update_cnt:
+        if update_cnt and self.counter is not None:
             normalized = word.lower().strip()
             self.counter.put(normalized)
         return translation

@@ -17,7 +17,7 @@ class LLMModel:
     _token_in_cache_miss_price = 0.27 / 1e6
     _token_out_price = 1.1 / 1e6
 
-    def __init__(self, key: SecretStr):
+    def __init__(self, key: SecretStr) -> None:
         self.key = key
         base_url = "https://api.deepseek.com"
         self._model = OpenAI(api_key=key.get_secret_value(), base_url=base_url)
@@ -52,16 +52,16 @@ class LLMModel:
                 {"role": "system", "content": "You are a native english speaker"},
                 {"role": "user", "content": prompt},
             ],
-            stream=False
+            stream=False,
         )
         token_in_cache = response.usage.prompt_cache_hit_tokens
         token_in_cache_miss = response.usage.prompt_cache_miss_tokens
         token_out = response.usage.completion_tokens
         price = (
-                token_in_cache * self._token_in_cache_price +
-                token_in_cache_miss * self._token_in_cache_miss_price +
-                token_out * self._token_out_price
-                 )
+            token_in_cache * self._token_in_cache_price
+            + token_in_cache_miss * self._token_in_cache_miss_price
+            + token_out * self._token_out_price
+        )
         logger.info(price)
         return response.choices[0].message.content
 
@@ -72,7 +72,7 @@ class LLMModel:
                 {"role": "system", "content": "You are a native english speaker"},
                 {"role": "user", "content": prompt},
             ],
-            stream=True
+            stream=True,
         )
         for item in response:
             yield "".join(_.delta.content for _ in item.choices)

@@ -1,60 +1,61 @@
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Query
+from fastapi import Query, Form
 from fastapi.routing import APIRouter
 from starlette.responses import HTMLResponse
 
 from db.task_db import TaskDB
 from schemas.tasks.match_word_explanation import MatchWordExplanation
+from schemas.tasks.no_new_words import NoNewWords
 from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
 from schemas.tasks.word2explanation import Word2Explanation
 from schemas.tasks.word_statistics_update import WordsStatisticUpdate
 from generator.tasks.task_generator import TaskGenerator
 
 tasks = APIRouter()
-db = TaskDB()
-generator = TaskGenerator()
+
 
 htmls_path = Path(__file__).parent.parent.parent / "static"
 
 
 @tasks.get("/tasks")
 def get_new_task(
+    uid: str = Query(),
     task_type: Optional[str] = Query(default=None),
-) -> Word2Explanation | SentenceWithPlaceholder | MatchWordExplanation:
+) -> Word2Explanation | SentenceWithPlaceholder | MatchWordExplanation | NoNewWords:
+    generator = TaskGenerator(uid)
     if task_type is not None and task_type.strip() == "":
         task_type = None
     return generator.new_task(task_type)
 
 
 @tasks.post("/update_statistics")
-def update_statistics(statistics: WordsStatisticUpdate) -> str:
-    for word in statistics:
-        db.update_task_statistic(
-            word=word.word,
-            is_correct=word.is_true,
-        )
-
+def update_statistics(
+        uid: str = Query(),
+        statistics: WordsStatisticUpdate = Form(),
+) -> str:
+    db = TaskDB(uid)
+    db.update_task_statistic(statistics)
     return "ok"
 
 
 @tasks.get("")
-def task() -> HTMLResponse:
+def task(uid: str = Query(), ) -> HTMLResponse:
     with open(htmls_path / "task.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)
 
 
 @tasks.get("/task_word2explanation")
-def task() -> HTMLResponse:
+def task_word2explanation(uid: str = Query(), ) -> HTMLResponse:
     with open(htmls_path / "task_word2explanation.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)
 
 
 @tasks.get("/task_other")
-def task_other() -> HTMLResponse:
+def task_other(uid: str = Query(), ) -> HTMLResponse:
     with open(htmls_path / "task_typing.html", "r") as f:
         code = f.read()
     return HTMLResponse(code)

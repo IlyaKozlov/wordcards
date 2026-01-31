@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Optional
 
 from db.words_cnt import WordsCounter
 from generator.page_to_normalized import PageToNormalized
@@ -12,19 +12,27 @@ logger = logging.getLogger(__name__)
 
 class TranslatorStream:
 
-    def __init__(self, model: LLMModel) -> None:
+    def __init__(
+        self,
+        model: LLMModel,
+        user_id: Optional[str] = None,
+    ) -> None:
         self.model = model
         self._cyrillic = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
         self._latin = "abcdefghijklmnopqrstuvwxyz"
         self._templates = Path(__file__).parent / "prompts"
         assert self._templates.is_dir()
         self.normalizer = PageToNormalized(model)
-        self.counter = WordsCounter()
+
+        if user_id:
+            self.counter = WordsCounter(user_id)
+        else:
+            self.counter = None
 
     @staticmethod
-    def from_env() -> "TranslatorStream":
+    def from_env(uid: Optional[str]) -> "TranslatorStream":
         model = LLMModel.from_env()
-        return TranslatorStream(model)
+        return TranslatorStream(model, user_id=uid)
 
     def handle(self, message: str) -> Iterable[Chunk]:
         if len(message) == 0:
@@ -64,7 +72,7 @@ class TranslatorStream:
         cyrillic_cnt = sum(letter in self._cyrillic for letter in message)
         return latin_cnt, cyrillic_cnt, word_cnt
 
-    def _translate_en_ru(self, message: str):
+    def _translate_en_ru(self, message: str) -> Iterable[Chunk]:
         message = message.strip()
         with open(self._templates / "translate_en_ru.txt") as f:
             template = f.read()
@@ -81,13 +89,14 @@ class TranslatorStream:
             for w in message.split()
             if self.normalizer.normalize_page(message).strip()
         ]
-        if len(words) <= 2:
-            self.counter.put(" ".join(words), weight=3)
-        else:
-            for w in words:
-                self.counter.put(w, weight=1)
+        if self.counter is not None:
+            if len(words) <= 2:
+                self.counter.put(" ".join(words), weight=3)
+            else:
+                for w in words:
+                    self.counter.put(w, weight=1)
 
-    def _translate_ru_en(self, message: str):
+    def _translate_ru_en(self, message: str) -> Iterable[Chunk]:
         with open(self._templates / "translate_ru_en.txt") as f:
             template = f.read()
         prompt = template.format(message=message)

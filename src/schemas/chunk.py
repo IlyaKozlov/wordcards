@@ -6,7 +6,7 @@ class Chunk(BaseModel):
     text: str
     message_type: MessageType
 
-    def __init__(self, message: str):
+    def __init__(self, message: str) -> None:
         assert len(message) > 0
         text = message.strip()
         if text.startswith("**"):

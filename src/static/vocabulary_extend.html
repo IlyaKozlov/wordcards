@@ -6,112 +6,119 @@
     <title>Add book / Translate in advance</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+<script src="/static/commonUtils.js"></script>
 <body>
-    <h1>Add book</h1>
-    <form id="uploadForm" onsubmit="return false;">
-        <div class="input-container">
-            <input id="bookFile" name="file" type="file" accept="application/pdf,application/epub+zip,text/plain,.doc,.docx" />
-        </div>
-        <div>
-            <button id="uploadBtn" class="button" type="button">Upload book</button>
-            <progress id="uploadProgress" value="0" max="100" style="width:300px; display:none"></progress>
-            <span id="uploadPercent"></span>
-        </div>
-    </form>
-
-    <hr>
-
-    <h2>Translate in advance</h2>
-    <div>
-        <label for="minCnt">min_cnt:</label>
-        <input id="minCnt" type="number" value="10" min="1" style="width:80px" />
-        <button id="translateBtn" class="button">Translate in advance</button>
+<h1>Add book</h1>
+<form id="uploadForm" onsubmit="return false;">
+    <div class="input-container">
+        <input id="bookFile" name="file" type="file"
+               accept="application/pdf,application/epub+zip,text/plain,.doc,.docx"/>
     </div>
-
-    <hr>
-
     <div>
-        <a href="/uncover/show_new_word" target="_blank" class="button" style="background:#10b981">Show new word</a>
+        <button id="uploadBtn" class="button" type="button">Upload book</button>
+        <progress id="uploadProgress" value="0" max="100" style="width:300px; display:none"></progress>
+        <span id="uploadPercent"></span>
     </div>
+</form>
 
-    <div id="output"></div>
-    <a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
-    <script>
-        // Upload with progress using XMLHttpRequest so we can show upload progress
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fileInput = document.getElementById('bookFile');
-        const progress = document.getElementById('uploadProgress');
-        const percent = document.getElementById('uploadPercent');
-        const output = document.getElementById('output');
+<hr>
 
-        uploadBtn.addEventListener('click', () => {
-            const file = fileInput.files[0];
-            if (!file) {
-                alert('Please choose a file to upload');
-                return;
+<h2>Translate in advance</h2>
+<div>
+    <label for="minCnt">min_cnt:</label>
+    <input id="minCnt" type="number" value="10" min="1" style="width:80px"/>
+    <button id="translateBtn" class="button">Translate in advance</button>
+</div>
+
+<hr>
+
+<div>
+    <a
+            onclick="window.open('/uncover/show_new_word?uid=' + encodeURIComponent(getUid()), '_blank'); return false;"
+            class="button" style="background:#10b981">Show new word</a>
+</div>
+
+<div id="output"></div>
+<a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
+
+<script>
+    // Upload with progress using XMLHttpRequest so we can show upload progress
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('bookFile');
+    const progress = document.getElementById('uploadProgress');
+    const percent = document.getElementById('uploadPercent');
+    const output = document.getElementById('output');
+    const uid = getUid();
+
+    uploadBtn.addEventListener('click', () => {
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('Please choose a file to upload');
+            return;
+        }
+        uploadBtn.disabled = true;
+        output.textContent = 'Starting upload...';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/add_words/add_book?uid=' + encodeURIComponent(uid));
+
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const pct = Math.round((e.loaded / e.total) * 100);
+                progress.style.display = '';
+                progress.value = pct;
+                percent.textContent = pct + '%';
             }
-            uploadBtn.disabled = true;
-            output.textContent = 'Starting upload...';
+        };
 
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/add_words/add_book');
-
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable) {
-                    const pct = Math.round((e.loaded / e.total) * 100);
-                    progress.style.display = '';
-                    progress.value = pct;
-                    percent.textContent = pct + '%';
-                }
-            };
-
-            xhr.onload = () => {
-                uploadBtn.disabled = false;
-                progress.style.display = 'none';
-                percent.textContent = '';
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    output.textContent = xhr.responseText;
-                } else {
-                    output.textContent = `Upload failed: ${xhr.status} ${xhr.statusText} - ${xhr.responseText}`;
-                }
-            };
-
-            xhr.onerror = () => {
-                uploadBtn.disabled = false;
-                progress.style.display = 'none';
-                percent.textContent = '';
-                output.textContent = 'Network error during upload';
-            };
-
-            xhr.send(formData);
-        });
-
-        // Translate in advance
-        const translateBtn = document.getElementById('translateBtn');
-        const minCntInput = document.getElementById('minCnt');
-
-        translateBtn.addEventListener('click', async () => {
-            const minCnt = minCntInput.value || '10';
-            translateBtn.disabled = true;
-            output.textContent = `Starting translate in advance (min_cnt=${minCnt})...`;
-
-            try {
-                const resp = await fetch(`/add_words/translate_all?min_cnt=${encodeURIComponent(minCnt)}`);
-                const text = await resp.text();
-                if (resp.ok) {
-                    output.textContent = text;
-                } else {
-                    output.textContent = `Error: ${resp.status} ${resp.statusText} - ${text}`;
-                }
-            } catch (e) {
-                output.textContent = 'Network error: ' + e;
-            } finally {
-                translateBtn.disabled = false;
+        xhr.onload = () => {
+            uploadBtn.disabled = false;
+            progress.style.display = 'none';
+            percent.textContent = '';
+            if (xhr.status >= 200 && xhr.status < 300) {
+                output.textContent = xhr.responseText;
+            } else {
+                output.textContent = `Upload failed: ${xhr.status} ${xhr.statusText} - ${xhr.responseText}`;
             }
-        });
-    </script>
+        };
+
+        xhr.onerror = () => {
+            uploadBtn.disabled = false;
+            progress.style.display = 'none';
+            percent.textContent = '';
+            output.textContent = 'Network error during upload';
+        };
+
+        xhr.send(formData);
+    });
+
+    // Translate in advance
+    const translateBtn = document.getElementById('translateBtn');
+    const minCntInput = document.getElementById('minCnt');
+
+    translateBtn.addEventListener('click', async () => {
+        const minCnt = minCntInput.value || '10';
+        translateBtn.disabled = true;
+        output.textContent = `Starting translate in advance (min_cnt=${minCnt})...`;
+
+        try {
+            const url = `/add_words/translate_all?min_cnt=${encodeURIComponent(minCnt)}` + "&uid=" + encodeURIComponent(uid)
+            const resp = await fetch(url);
+            const text = await resp.text();
+            if (resp.ok) {
+                output.textContent = text;
+            } else {
+                output.textContent = `Error: ${resp.status} ${resp.statusText} - ${text}`;
+            }
+        } catch (e) {
+            output.textContent = 'Network error: ' + e;
+        } finally {
+            translateBtn.disabled = false;
+        }
+    });
+</script>
 </body>
 </html>
