@@ -42,7 +42,7 @@ class WordDB(Database):
         return learning_word_data
 
     def save_word_explanation(self, word: str, explanations: List[WordExplanation]) -> None:
-        with open(self._path_learning) as f:
+        with open(self._path_learning, encoding="utf-8") as f:
             data = json.load(f)
         data[word] = [expl.model_dump() for expl in explanations]
         self.save_object(data, self._path_learning)
