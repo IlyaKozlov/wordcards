@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Query, Form
+from fastapi import Query, Body
 from fastapi.routing import APIRouter
 from starlette.responses import HTMLResponse
 
@@ -33,7 +33,7 @@ def get_new_task(
 @tasks.post("/update_statistics")
 def update_statistics(
         uid: str = Query(),
-        statistics: WordsStatisticUpdate = Form(),
+        statistics: WordsStatisticUpdate = Body(),
 ) -> str:
     db = TaskDB(uid)
     db.update_task_statistic(statistics)
