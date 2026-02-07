@@ -2,7 +2,7 @@ from db.task_db import TaskDB
 from collections import Counter
 import matplotlib.pyplot as plt
 
-db = TaskDB()
+db = TaskDB(user_id="ilya")
 
 
 
