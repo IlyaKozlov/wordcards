@@ -39,6 +39,7 @@
 </div>
 <a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
 
+<script src="/static/commonUtils.js"></script>
 <script src="/static/taskCounter.js"></script>
 <script>
     fetchNewTask();
@@ -63,6 +64,10 @@
     }
     loadWordExplanationGame();
 
+    function getNewTask() {
+        window.location.replace("/static/task.html");
+    }
+
     async function checkAnswer(answer) {
         const isTrue = (answer === rightAnswerId);
         updateTaskStatistics([[targetWord, isTrue]]);
@@ -73,10 +78,16 @@
         rightAnswerElement.classList.add('buttonRight');
 
         if (isTrue) {
+            const answer = [[targetWord, true]];
+            console.log(answer);
+            updateTaskStatistics(answer);
             // Correct answer, get a new task
             setTimeout(getNewTask, 800);
         } else {
             // Incorrect answer, show explanation
+            const answer = [[targetWord, false]];
+            console.log(answer);
+            updateTaskStatistics(answer);
             answerElement.classList.remove('button')
             answerElement.classList.add('buttonWrong')
 

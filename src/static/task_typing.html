@@ -18,14 +18,19 @@
 </div>
 <a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
 
+<script src="/static/commonUtils.js"></script>
 <script src="/static/taskCounter.js"></script>
 <script>
     fetchNewTask();
     let taskId;
 
     async function checkAnswer(answer) {
-        updateTaskStatistics([[answer.lower, true]]);
+        await updateTaskStatistics([[answer, true]]);
         setTimeout(getNewTask, 1000);
+    }
+
+    function getNewTask() {
+        window.location.replace("/static/task.html");
     }
 
     async function loadTypeTextGame() {
@@ -75,7 +80,7 @@
 
                 document.getElementById('message').innerHTML = "You typed the correct word!";
                 document.getElementById('message').innerHTML = "";
-                checkAnswer(userInput.toLowerCase());
+                checkAnswer(hiddenWord.toLowerCase());
             }
         });
 

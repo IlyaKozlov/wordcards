@@ -3,12 +3,6 @@ const uid = getUid();
 let completed = sessionStorage.getItem('completed_tasks') || 0;
 document.getElementById('counter').textContent = `Task №: ${completed}`;
 
-
-
-function getNewTask() {
-    window.location.replace("/static/task.html" + "?uid=" + encodeURIComponent(uid));
-}
-
 const taskUrl = '/tasks/tasks' + "?uid=" + encodeURIComponent(uid);
 
 function updateTaskStatistics(wordTuples) {

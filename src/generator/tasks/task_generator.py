@@ -42,7 +42,7 @@ class TaskGenerator:
             return NoNewWords()
         if task_type is not None:
             generators = self._tasks_generators.get(task_type)
-        elif min(word.hits for word in words.words) <= 2:
+        elif min(word.hits for word in words.words) < 2:
             generators = [
                 self._match_word2explanation,
                 self._match_word2translation,
