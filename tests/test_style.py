@@ -18,6 +18,7 @@ def get_files() -> List[str]:
 
 def test_style() -> None:
     """Test that we conform to flake."""
+    print()
     style_guide = flake8.get_style_guide(
         ignore=[
             "E501",

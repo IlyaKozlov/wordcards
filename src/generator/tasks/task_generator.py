@@ -50,7 +50,7 @@ class TaskGenerator:
                 self._match_word2translation,
             ]
         else:
-            tasks_generators = dict(**self._tasks_generators) 
+            tasks_generators = dict(**self._tasks_generators)
             has_audio = all(_.audio is not None for _ in words.words)
             if not has_audio:
                 tasks_generators.pop("MatchWordAudio")

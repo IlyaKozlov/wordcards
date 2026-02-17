@@ -1,11 +1,9 @@
 import json
 import logging
-from typing import List, Dict, Optional
-from collections import Counter
+from typing import Dict, Optional
 
 from db.db_abc import Database
 from generator.audio_downloader import AudioDownloader
-from schemas.word_explanation import WordExplanation
 
 
 class AudioDB(Database):

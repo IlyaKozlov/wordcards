@@ -31,8 +31,3 @@ class AudioDownloader:
         if len(word.split()) != 1 or len(word) == 0:
             return None
         return word
-
-
-if __name__ == '__main__':
-    downloader = AudioDownloader()
-    print(downloader.get_audio_url("friend"))
