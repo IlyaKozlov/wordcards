@@ -6,6 +6,7 @@ from fastapi.routing import APIRouter
 from starlette.responses import HTMLResponse
 
 from db.task_db import TaskDB
+from schemas.tasks.match_word2audio import MatchWordAudio
 from schemas.tasks.match_word_explanation import MatchWordExplanation
 from schemas.tasks.no_new_words import NoNewWords
 from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
@@ -23,7 +24,7 @@ htmls_path = Path(__file__).parent.parent.parent / "static"
 def get_new_task(
     uid: str = Query(),
     task_type: Optional[str] = Query(default=None),
-) -> Word2Explanation | SentenceWithPlaceholder | MatchWordExplanation | NoNewWords:
+) -> Word2Explanation | SentenceWithPlaceholder | MatchWordExplanation | MatchWordAudio | NoNewWords:
     generator = TaskGenerator(uid)
     if task_type is not None and task_type.strip() == "":
         task_type = None

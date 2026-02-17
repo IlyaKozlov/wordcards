@@ -42,6 +42,9 @@
             } else if (taskType === "NoNewWords") {
                 url = "/static/no_new_words.html";
             }
+            else if (taskType === "MatchWordAudio") {
+                url = "/static/task_audio.html";
+            }
             else {
                 url = "/static/task_match.html"
                 alert(`Unknow task type ${taskType}`);

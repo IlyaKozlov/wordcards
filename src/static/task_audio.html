@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Words Game</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+
+        .box {
+            width: 30%;
+            padding: 10px;
+            border: 1px solid #000;
+            margin: 5px;
+            box-sizing: border-box;
+        }
+
+        .box-large {
+            width: 65%;
+        }
+
+        /* audio box layout: keep a play icon on the right */
+        .audio-box {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* icon on the right */
+            gap: 10px;
+        }
+
+        .play-icon {
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+    </style>
+</head>
+<body>
+<h1> Match words </h1>
+<p id="counter"></p>
+
+<div class="container">
+    <p> 1 </p>
+    <div class="box" id="word-0" onclick="selectWord(0)"></div>
+    <p> a </p>
+    <div class="box box-large" id="audio-0" onclick="selectAudio(0)"></div>
+</div>
+<div class="container">
+    <p> 2 </p>
+    <div class="box" id="word-1" onclick="selectWord(1)"></div>
+    <p> b </p>
+    <div class="box box-large" id="audio-1" onclick="selectAudio(1)"></div>
+</div>
+<div class="container">
+    <p> 3 </p>
+    <div class="box" id="word-2" onclick="selectWord(2)"></div>
+    <p> c </p>
+    <div class="box box-large" id="audio-2" onclick="selectAudio(2)"></div>
+</div>
+<div class="container">
+    <p> 4 </p>
+    <div class="box" id="word-3" onclick="selectWord(3)"></div>
+    <p> d </p>
+    <div class="box box-large" id="audio-3" onclick="selectAudio(3)"></div>
+</div>
+<a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
+
+<script src="/static/commonUtils.js"></script>
+<script src="/static/taskCounter.js"></script>
+<script>
+
+    let selectedWord = null;
+    let selectedAudio = null;
+
+    fetchNewTask();
+
+
+    function isTaskValid(task) {
+        return task.word1 !== null && task.word2 !== null &&
+               task.word3 !== null && task.word4 !== null &&
+               task.audio1 !== null && task.audio2 !== null &&
+               task.audio3 !== null && task.audio4 !== null;
+    }
+    let data = null;
+    let box2word = null;
+    let box2audio = null;
+    async function loadTask() {
+
+        const task = await getTaskContent("MatchWordAudio", isTaskValid);
+        data = [
+            {word: task.word1, audio: task.audio1, matched: false},
+            {word: task.word2, audio: task.audio2, matched: false},
+            {word: task.word3, audio: task.audio3, matched: false},
+            {word: task.word4, audio: task.audio4, matched: false}
+        ];
+        box2word = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+        box2audio = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+        updateView();
+    }
+
+    loadTask();
+
+    function chooseAnswerKey(e) {
+
+        if (e.key === '1') {
+            selectWord(0);
+        } else if (e.key === '2') {
+            selectWord(1);
+        } else if (e.key === '3') {
+            selectWord(2);
+        } else if (e.key === '4') {
+            selectWord(3);
+        } else if (e.key === 'a' || e.key === 'A' || e.key === 'ф' || e.key === 'Ф') {
+            selectAudio(0);
+        } else if (e.key === 'b' || e.key === 'B' || e.key === 'и' || e.key === 'И') {
+            selectAudio(1);
+        } else if (e.key === 'c' || e.key === 'C' || e.key === 'с' || e.key === 'С') {
+            selectAudio(2);
+        } else if (e.key === 'd' || e.key === 'D' || e.key === 'в' || e.key === 'В') {
+            selectAudio(3);
+        }
+    }
+    document.addEventListener("keydown", chooseAnswerKey);
+
+
+    function flashElement(element) {
+        const flashCount = 3; // Set the number of times to flash
+        for (let i = 0; i < flashCount; i++) {
+            setTimeout(() => {
+                element.style.backgroundColor = (i % 2 === 0) ? 'red' : 'white';
+            }, i * 300); // Change the timing as needed
+        }
+        setTimeout(() => {
+            element.style.backgroundColor = 'white'; // Ensure it ends as white
+        }, flashCount * 300);
+    }
+
+    function getNewTask() {
+        const answer = data.map(d => [d.word, true]);
+        console.log(answer);
+        updateTaskStatistics(answer);
+        window.location.replace("/static/task.html");
+    }
+
+    function updateView() {
+        for (let i = 0; i < box2word.length; i++) {
+            const wordBox = document.getElementById(`word-${i}`);
+            const audioBox = document.getElementById(`audio-${i}`);
+
+            const wordId = box2word[i];
+            const audioId = box2audio[i];
+            wordBox.textContent = data[wordId].word;
+            // place a play icon and an audio element (hidden controls) in the audio box
+            audioBox.classList.add('audio-box');
+            if (data[audioId].audio.startsWith("http")) {
+                audioBox.innerHTML = `<span class="play-icon">▶</span><audio preload="auto" src="${data[audioId].audio}"></audio>`;
+            }
+            else {
+                audioBox.innerHTML = `<p> "${data[audioId].word}" </p>`;
+            }
+
+
+            if (data[wordId].matched) {
+                wordBox.style.backgroundColor = 'green';
+                audioBox.style.backgroundColor = 'green';
+                // stop audio if it's playing
+                const audioEl = audioBox.querySelector('audio');
+                if (audioEl) { audioEl.pause(); audioEl.currentTime = 0; }
+            } else {
+                wordBox.style.backgroundColor = 'white';
+                audioBox.style.backgroundColor = 'white';
+            }
+        }
+
+        if (data.every(item => item.matched)) {
+            setTimeout(getNewTask, 200);
+        }
+
+    }
+
+    function match() {
+        const wordId = box2word[selectedWord];
+        const audioId = box2audio[selectedAudio];
+        if (wordId === audioId) {
+            const wordBox = document.getElementById(`word-${selectedWord}`);
+            const audioBox = document.getElementById(`audio-${selectedAudio}`);
+            wordBox.style.backgroundColor = 'green';
+            audioBox.style.backgroundColor = 'green';
+            data[wordId]["matched"] = true;
+
+            // stop audio if playing
+            const audioEl = audioBox.querySelector('audio');
+            if (audioEl) { audioEl.pause(); audioEl.currentTime = 0; }
+
+            selectedWord = null;
+            selectedAudio = null;
+
+            box2word = box2word.sort((a, b) => data[a]["matched"] - data[b]["matched"]);
+            box2audio = box2audio.sort((a, b) => data[a]["matched"] - data[b]["matched"]);
+            setTimeout(updateView, 200);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function selectWord(id) {
+        // check if already matched
+        if (data[box2word[id]].matched) {
+            // nothing to do
+            return;
+        }
+
+        const newElement = document.getElementById(`word-${id}`);
+        if (selectedWord === id) {
+            // unselect
+            newElement.style.backgroundColor = 'white';
+            selectedWord = null;
+            return;
+        }
+        if (selectedWord !== null) {
+            const oldElement = document.getElementById(`word-${selectedWord}`);
+            oldElement.style.backgroundColor = 'white';
+        }
+        selectedWord = id;
+        newElement.style.backgroundColor = 'lightgray';
+
+        if (selectedAudio !== null) {
+            const matched = match();
+            if (!matched) {
+                selectedWord = null;
+                flashElement(newElement);
+                newElement.style.backgroundColor = 'white';
+            }
+        }
+    }
+
+
+    function selectAudio(id) {
+        if (data[box2audio[id]].matched) {
+            // nothing to do
+            return;
+        }
+        const newElement = document.getElementById(`audio-${id}`);
+        const audioEl = newElement.querySelector('audio');
+
+        if (selectedAudio === id) {
+            // unselect
+            newElement.style.backgroundColor = 'white';
+            selectedAudio = null;
+            if (audioEl) { audioEl.pause(); audioEl.currentTime = 0; }
+            return;
+        }
+        if (selectedAudio !== null) {
+            const oldElement = document.getElementById(`audio-${selectedAudio}`);
+            oldElement.style.backgroundColor = 'white';
+            const oldAudio = oldElement.querySelector('audio');
+            if (oldAudio) { oldAudio.pause(); oldAudio.currentTime = 0; }
+        }
+        selectedAudio = id;
+        newElement.style.backgroundColor = 'lightgray';
+
+        // play sound for selected audio box
+        if (audioEl) {
+            try {
+                audioEl.currentTime = 0;
+                audioEl.play();
+            } catch (err) {
+                // ignore play errors
+            }
+        }
+
+        if (selectedWord !== null) {
+            const matched = match();
+            if (!matched) {
+                selectedAudio = null;
+                flashElement(newElement);
+                newElement.style.backgroundColor = 'white';
+            }
+        }
+    }
+
+
+</script>
+
+</body>
+</html>
