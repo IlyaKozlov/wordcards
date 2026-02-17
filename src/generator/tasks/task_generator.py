@@ -44,7 +44,7 @@ class TaskGenerator:
             return NoNewWords()
         if task_type is not None:
             generators = self._tasks_generators.get(task_type)
-        elif min(word.hits for word in words.words) < -2:
+        elif min(word.hits for word in words.words) < 2:
             generators = [
                 self._match_word2explanation,
                 self._match_word2translation,
@@ -202,6 +202,7 @@ class TaskGenerator:
         )
 
     def _match_word2audio(self, words: TaskWords) -> MatchWordAudio:
+        self.logger.info("Generated task word2audio")
         return MatchWordAudio(
             task_id=words.task_id,
             word1=words.words[0].word,
