@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -11,6 +11,7 @@ class WordExplanation(BaseModel):
     explanation: str
     sentences: List[str]
     translation: str
+    audio: Optional[str] = None
 
     @property
     def explanation_hidden(self) -> str:

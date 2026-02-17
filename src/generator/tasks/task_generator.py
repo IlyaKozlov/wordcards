@@ -6,6 +6,7 @@ from typing import Optional
 from db.task_db import TaskDB
 from generator.tasks.task_words import TaskWords
 from generator.tasks.task_words_sampler import TaskWordsSampler
+from schemas.tasks.match_word2audio import MatchWordAudio
 from schemas.tasks.match_word_explanation import MatchWordExplanation
 from schemas.tasks.no_new_words import NoNewWords
 from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
@@ -31,6 +32,7 @@ class TaskGenerator:
                 self._match_word2sentence,
                 self._match_word2translation,
             ],
+            "MatchWordAudio": [self._match_word2audio]
         }
 
     def new_task(
@@ -42,17 +44,21 @@ class TaskGenerator:
             return NoNewWords()
         if task_type is not None:
             generators = self._tasks_generators.get(task_type)
-        elif min(word.hits for word in words.words) < 2:
+        elif min(word.hits for word in words.words) < -2:
             generators = [
                 self._match_word2explanation,
                 self._match_word2translation,
             ]
         else:
+            tasks_generators = dict(**self._tasks_generators) 
+            has_audio = all(_.audio is not None for _ in words.words)
+            if not has_audio:
+                tasks_generators.pop("MatchWordAudio")
             generators = [
-                gen for item in self._tasks_generators.values() for gen in item
+                gen for item in tasks_generators.values() for gen in item
             ]
-
-        return random.choice(generators)(words)
+        result = random.choice(generators)(words)
+        return result
 
     def _match_word2sentence(self, words: TaskWords) -> MatchWordExplanation:
         self.logger.info("Generated task explanation2word")
@@ -193,4 +199,17 @@ class TaskGenerator:
             explanation=items[right_answer_id].translation,
             right_answer_id=right_answer_id + 1,
             target_word=items[right_answer_id].word,
+        )
+
+    def _match_word2audio(self, words: TaskWords) -> MatchWordAudio:
+        return MatchWordAudio(
+            task_id=words.task_id,
+            word1=words.words[0].word,
+            audio1=words.words[0].audio if words.words[0].audio else words.words[0].word,
+            word2=words.words[1].word,
+            audio2=words.words[1].audio if words.words[1].audio else words.words[1].word,
+            word3=words.words[2].word,
+            audio3=words.words[2].audio if words.words[2].audio else words.words[2].word,
+            word4=words.words[3].word,
+            audio4=words.words[3].audio if words.words[3].audio else words.words[3].word,
         )

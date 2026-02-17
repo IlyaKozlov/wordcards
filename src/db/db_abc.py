@@ -21,6 +21,7 @@ class Database(abc.ABC):
         self._path_learning = self._directory_path / "learning_words.json"
         self._path_known = self._directory_path / "known_words.json"
         self._path_all_words = self._directory_path / "all_words.json"
+        self._path_audio = self._directory_path.parent / "word2audio.json"
 
         for path, obj in (
             (self._path_known, []),

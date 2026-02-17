@@ -6,6 +6,7 @@ from typing import List, Optional, Dict
 from uuid import UUID
 
 from db.db_abc import Database
+from db.db_audio import AudioDB
 from schemas.tasks.task_answer import TaskAnswer
 from schemas.tasks.word_statistics_update import WordsStatisticUpdate
 from schemas.word_explanation import WordExplanation
@@ -18,6 +19,7 @@ class TaskDB(Database):
         super().__init__(user_id)
         self._task_path = self._directory_path / "tasks.json"
         self._task_statistic_path = self._directory_path / "tasks_statistic.json"
+        self._audio_db = AudioDB(user_id)
 
     def get_four_words(
         self,
@@ -39,6 +41,9 @@ class TaskDB(Database):
             result.append(WordExplanation.model_validate(explanation))
         if result is None or len(result) != 4:
             raise HTTPException("Not enough items to fetch new task")
+        for word in result:
+            audio = self._audio_db.get_audio_url(word.word)
+            word.audio = audio if audio else None
         return result
 
     def update_task_statistic(
