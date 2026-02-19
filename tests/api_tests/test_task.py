@@ -8,7 +8,7 @@ from schemas.tasks.word2explanation import Word2Explanation
 base_url = "http://localhost:2218"
 
 
-def test_filldb():
+def test_filldb() -> None:
     for word in ["one", "two", "three", "four", "five"]:
         data = {"word": word}
         params = {"uid": "test_user"}

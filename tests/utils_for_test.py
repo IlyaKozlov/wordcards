@@ -6,7 +6,7 @@ import zipfile
 
 
 @pytest.fixture
-def fill_db():
+def fill_db() -> None:
     db_path = Path(__file__).parent.parent / "db"
     db_path_uid = db_path / "test"
     if db_path_uid.exists():
