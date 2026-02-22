@@ -47,6 +47,7 @@
     let targetWord = null;
     let rightAnswerId = null;
     let explanation = null;
+    let audioUrl = null;
 
     async function loadWordExplanationGame() {
         const data = await getTaskContent("Word2Explanation");
@@ -61,6 +62,7 @@
         taskId = data.task_id;
         rightAnswerId = data.right_answer_id;
         targetWord = data.target_word;
+        audioUrl = data.audio_url;
     }
     loadWordExplanationGame();
 
@@ -81,8 +83,9 @@
             const answer = [[targetWord, true]];
             console.log(answer);
             updateTaskStatistics(answer);
+            await playAudio(audioUrl);
             // Correct answer, get a new task
-            setTimeout(getNewTask, 800);
+            setTimeout(getNewTask, 300);
         } else {
             // Incorrect answer, show explanation
             const answer = [[targetWord, false]];
@@ -91,10 +94,12 @@
             answerElement.classList.remove('button')
             answerElement.classList.add('buttonWrong')
 
+            await playAudio(audioUrl);
             let explanation = `<p> <button onclick="getNewTask()">OK</button> <p>`;
             document.getElementById('explanation').classList.remove('hidden');
             document.getElementById('explanation').innerHTML = explanation;
             document.addEventListener("keydown", getNewTaskKeyDown);
+            await playAudio(audioUrl);
         }
     }
 
