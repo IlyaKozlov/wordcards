@@ -24,9 +24,11 @@
     fetchNewTask();
     let taskId;
 
-    async function checkAnswer(answer) {
+    async function checkAnswer(answer, audio) {
+        await playAudio(audio);
+        await playAudio(audio);
         await updateTaskStatistics([[answer, true]]);
-        setTimeout(getNewTask, 1000);
+        setTimeout(getNewTask, 200);
     }
 
     function getNewTask() {
@@ -80,7 +82,8 @@
 
                 document.getElementById('message').innerHTML = "You typed the correct word!";
                 document.getElementById('message').innerHTML = "";
-                checkAnswer(hiddenWord.toLowerCase());
+
+                checkAnswer(hiddenWord.toLowerCase(), data.audio_url);
             }
         });
 

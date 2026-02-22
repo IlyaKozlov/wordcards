@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -6,5 +8,6 @@ class SentenceWithPlaceholder(BaseModel):
     sentence: str
     explanation: str
     word: str
+    audio_url: Optional[str]
     word_part: str
     task_type: str = "SentenceWithPlaceholder"

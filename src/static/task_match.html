@@ -79,10 +79,10 @@
 
         const task = await getTaskContent("MatchWordExplanation", isTaskValid);
         data = [
-            {word: task.word1, explanation: task.explanation1, matched: false},
-            {word: task.word2, explanation: task.explanation2, matched: false},
-            {word: task.word3, explanation: task.explanation3, matched: false},
-            {word: task.word4, explanation: task.explanation4, matched: false}
+            {word: task.word1, audio: task.audio1,  explanation: task.explanation1, placeholder: task.explanation_placeholder1, matched: false},
+            {word: task.word2, audio: task.audio2, explanation: task.explanation2, placeholder: task.explanation_placeholder2, matched: false},
+            {word: task.word3, audio: task.audio3, explanation: task.explanation3, placeholder: task.explanation_placeholder3, matched: false},
+            {word: task.word4, audio: task.audio4, explanation: task.explanation4, placeholder: task.explanation_placeholder4, matched: false}
         ];
         box2word = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
         box2explanation = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
@@ -158,14 +158,9 @@
                 explanationBox.style.backgroundColor = 'white';
             }
         }
-
-        if (data.every(item => item.matched)) {
-            setTimeout(getNewTask, 200);
-        }
-
     }
 
-    function match() {
+    async function match() {
         const wordId = box2word[selectedWord];
         const explanationId = box2explanation[selectedExplanation];
         if (wordId === explanationId) {
@@ -175,7 +170,7 @@
             explanationBox.style.backgroundColor = 'green';
             data[wordId]["matched"] = true;
             const word = data[wordId].word;
-            data[wordId].explanation = data[wordId].explanation.replace("***", `<b>${word}</b>`);
+            data[wordId].explanation = replacePlaceholders(data[wordId].explanation, data[wordId].placeholder);
 
             selectedWord = null;
             selectedExplanation = null;
@@ -183,14 +178,17 @@
             box2word = box2word.sort((a, b) => data[a]["matched"] - data[b]["matched"]);
             box2explanation = box2explanation.sort((a, b) => data[a]["matched"] - data[b]["matched"]);
             setTimeout(updateView, 200);
-
+            await playAudio( data[wordId].audio);
+            if (data.every(item => item.matched)) {
+                setTimeout(getNewTask, 300);
+            }
             return true;
         } else {
             return false;
         }
     }
 
-    function selectWord(id) {
+    async function selectWord(id) {
         // check if already matched
         if (data[box2word[id]].matched) {
             // nothing to do
@@ -212,7 +210,7 @@
         newElement.style.backgroundColor = 'lightgray';
 
         if (selectedExplanation !== null) {
-            const matched = match();
+            const matched = await match();
             if (!matched) {
                 selectedWord = null;
                 flashElement(newElement);
@@ -222,7 +220,7 @@
     }
 
 
-    function selectExplanation(id) {
+    async function selectExplanation(id) {
         if (data[box2explanation[id]].matched) {
             // nothing to do
             return;
@@ -242,7 +240,7 @@
         newElement.style.backgroundColor = 'lightgray';
 
         if (selectedWord !== null) {
-            const matched = match();
+            const matched = await match();
             if (!matched) {
                 selectedExplanation = null;
                 flashElement(newElement);

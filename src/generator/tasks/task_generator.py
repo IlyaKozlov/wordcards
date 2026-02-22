@@ -32,7 +32,7 @@ class TaskGenerator:
                 self._match_word2sentence,
                 self._match_word2translation,
             ],
-            "MatchWordAudio": [self._match_word2audio]
+            "MatchWordAudio": [self._match_word2audio],
         }
 
     def new_task(
@@ -52,16 +52,15 @@ class TaskGenerator:
         else:
             tasks_generators = dict(**self._tasks_generators)
             has_audio = all(_.audio is not None for _ in words.words)
-            if not has_audio:
+            if not has_audio and "MatchWordAudio" in tasks_generators:
                 tasks_generators.pop("MatchWordAudio")
-            generators = [
-                gen for item in tasks_generators.values() for gen in item
-            ]
+            generators = [gen for item in tasks_generators.values() for gen in item]
         result = random.choice(generators)(words)
+        self.logger.info(f"Generated task type {result.task_type}")
         return result
 
     def _match_word2sentence(self, words: TaskWords) -> MatchWordExplanation:
-        self.logger.info("Generated task explanation2word")
+        self.logger.info("Generated task word2sentence")
         items = words.words
         sentences = [
             random.choice(item.sentences_with_placeholder).replace("PLACEHOLDER", "***")
@@ -70,13 +69,21 @@ class TaskGenerator:
         return MatchWordExplanation(
             task_id=words.task_id,
             word1=items[0].word,
+            audio1=items[0].audio,
             explanation1=sentences[0],
+            explanation_placeholder1=items[0].placeholders,
             word2=items[1].word,
+            audio2=items[1].audio,
             explanation2=sentences[1],
+            explanation_placeholder2=items[1].placeholders,
             word3=items[2].word,
+            audio3=items[2].audio,
             explanation3=sentences[2],
+            explanation_placeholder3=items[2].placeholders,
             word4=items[3].word,
+            audio4=items[3].audio,
             explanation4=sentences[3],
+            explanation_placeholder4=items[3].placeholders,
         )
 
     def _match_word2translation(self, words: TaskWords) -> MatchWordExplanation:
@@ -86,30 +93,47 @@ class TaskGenerator:
             task_id=words.task_id,
             word1=items[0].word,
             explanation1=items[0].translation,
+            explanation_placeholder1=None,
+            audio1=items[0].audio if items[0].audio else items[0].word,
             word2=items[1].word,
             explanation2=items[1].translation,
+            explanation_placeholder2=None,
+            audio2=items[1].audio if items[1].audio else items[1].word,
             word3=items[2].word,
             explanation3=items[2].translation,
+            explanation_placeholder3=None,
+            audio3=items[2].audio if items[2].audio else items[2].word,
             word4=items[3].word,
             explanation4=items[3].translation,
+            explanation_placeholder4=None,
+            audio4=items[3].audio if items[3].audio else items[3].word,
         )
 
     def _match_word2explanation(self, words: TaskWords) -> MatchWordExplanation:
         items = words.words
-        self.logger.info("Generated task explanation2word")
+        self.logger.info("Generated task word2explanation")
         return MatchWordExplanation(
             task_id=words.task_id,
             word1=items[0].word,
+            audio1=items[0].audio if items[0].audio else None,
             explanation1=items[0].explanation_hidden,
+            explanation_placeholder1=items[0].placeholders,
             word2=items[1].word,
+            audio2=items[1].audio if items[1].audio else None,
             explanation2=items[1].explanation_hidden,
+            explanation_placeholder2=items[1].placeholders,
             word3=items[2].word,
+            audio3=items[2].audio if items[2].audio else None,
             explanation3=items[2].explanation_hidden,
+            explanation_placeholder3=items[2].placeholders,
             word4=items[3].word,
+            audio4=items[3].audio if items[3].audio else None,
             explanation4=items[3].explanation_hidden,
+            explanation_placeholder4=items[3].placeholders,
         )
 
     def _explanation2word(self, words: TaskWords) -> Word2Explanation:
+        self.logger.info("Generated task explanation2word")
         items = words.words
         right_answer_id = random.choice(range(len(items)))
         task_id = words.task_id
@@ -121,19 +145,24 @@ class TaskGenerator:
             + items[right_answer_id].explanation,
             right_answer=str(right_answer_id + 1),
         )
-        self.logger.info("Generated task explanation2word")
         return Word2Explanation(
             task_id=task_id,
             word1=items[0].explanation_hidden,
             word2=items[1].explanation_hidden,
             word3=items[2].explanation_hidden,
             word4=items[3].explanation_hidden,
+            audio_url=(
+                items[right_answer_id].audio if items[right_answer_id].audio else None
+            ),
             explanation=items[right_answer_id].word,
+            explanation_placeholder=None,
             right_answer_id=right_answer_id + 1,
             target_word=items[right_answer_id].word,
+            target_word_placeholder=items[right_answer_id].placeholders,
         )
 
     def _sentence_with_placeholder(self, words: TaskWords) -> SentenceWithPlaceholder:
+        self.logger.info("Generated task sentence_with_placeholder")
         item: WordExplanation = random.choice(words.words)
         sentence: str = random.choice(item.sentences_with_placeholder)
         self.db.save_task(
@@ -142,16 +171,17 @@ class TaskGenerator:
             explanation="",
             right_answer=item.word.lower(),
         )
-        self.logger.info("Generated task sentence_with_placeholder")
         return SentenceWithPlaceholder(
             task_id=words.task_id,
             explanation=item.explanation_hidden,
             word=item.word,
+            audio_url=item.audio if item.audio else None,
             word_part=item.word_part,
             sentence=sentence,
         )
 
     def _word2explanation(self, words: TaskWords) -> Word2Explanation:
+        self.logger.info("Generated task word2explanation")
         items = words.words
         right_answer_id = random.choice(range(len(items)))
         self.db.save_task(
@@ -162,20 +192,24 @@ class TaskGenerator:
             + items[right_answer_id].explanation,
             right_answer=str(right_answer_id + 1),
         )
-        self.logger.info("Generated task word2explanation")
         return Word2Explanation(
             task_id=words.task_id,
             word1=items[0].word,
             word2=items[1].word,
             word3=items[2].word,
             word4=items[3].word,
+            audio_url=(
+                items[right_answer_id].audio if items[right_answer_id].audio else None
+            ),
             explanation=items[right_answer_id].explanation_hidden,
+            explanation_placeholder=items[right_answer_id].placeholders,
             right_answer_id=right_answer_id + 1,
             target_word=items[right_answer_id].word,
+            target_word_placeholder=None,
         )
 
     def _word2translation(self, words: TaskWords) -> Word2Explanation:
-
+        self.logger.info("Generated task word2translation")
         items = words.words
         if items is None or len(items) != 4:
             raise HTTPException("Not enough items to fetch new task")
@@ -189,16 +223,21 @@ class TaskGenerator:
             + items[right_answer_id].explanation,
             right_answer=str(right_answer_id + 1),
         )
-        self.logger.info("Generated task word2translation")
+
         return Word2Explanation(
             task_id=words.task_id,
             word1=items[0].word,
             word2=items[1].word,
             word3=items[2].word,
             word4=items[3].word,
+            audio_url=(
+                items[right_answer_id].audio if items[right_answer_id].audio else None
+            ),
             explanation=items[right_answer_id].translation,
+            explanation_placeholder=None,
             right_answer_id=right_answer_id + 1,
             target_word=items[right_answer_id].word,
+            target_word_placeholder=None,
         )
 
     def _match_word2audio(self, words: TaskWords) -> MatchWordAudio:
@@ -206,11 +245,19 @@ class TaskGenerator:
         return MatchWordAudio(
             task_id=words.task_id,
             word1=words.words[0].word,
-            audio1=words.words[0].audio if words.words[0].audio else words.words[0].word,
+            audio1=(
+                words.words[0].audio if words.words[0].audio else words.words[0].word
+            ),
             word2=words.words[1].word,
-            audio2=words.words[1].audio if words.words[1].audio else words.words[1].word,
+            audio2=(
+                words.words[1].audio if words.words[1].audio else words.words[1].word
+            ),
             word3=words.words[2].word,
-            audio3=words.words[2].audio if words.words[2].audio else words.words[2].word,
+            audio3=(
+                words.words[2].audio if words.words[2].audio else words.words[2].word
+            ),
             word4=words.words[3].word,
-            audio4=words.words[3].audio if words.words[3].audio else words.words[3].word,
+            audio4=(
+                words.words[3].audio if words.words[3].audio else words.words[3].word
+            ),
         )
