@@ -4,6 +4,9 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+_placeholder_regexp = r"_[^_]+_"
+
+
 class WordExplanation(BaseModel):
     hits: int = 0
     word: str
@@ -30,7 +33,15 @@ class WordExplanation(BaseModel):
 
     @staticmethod
     def _replace_underscore(string: str, replacement: str) -> str:
-        result = re.sub(r"_[^_]+_", replacement, string)
+        result = re.sub(_placeholder_regexp, replacement, string)
         if replacement not in result:
             result += f" ({replacement})"
         return result
+
+    @property
+    def placeholders(self) -> List[str]:
+        return [
+            match[1:-1]
+            for match in re.findall(_placeholder_regexp, self.explanation)
+            if len(match) > 2
+        ]

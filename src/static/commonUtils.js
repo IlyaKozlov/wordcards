@@ -38,3 +38,13 @@ async function playAudio(url) {
     }
 }
 
+function replacePlaceholders(text, placeholders) {
+    if (Array.isArray(placeholders) && placeholders.length > 0) {
+        placeholders.forEach((placeholder, index) => {
+            text = text.replace('***', `<b>${placeholder}</b>`);
+        });
+    }
+    return text;
+}
+
+

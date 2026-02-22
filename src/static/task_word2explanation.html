@@ -45,8 +45,10 @@
     fetchNewTask();
     let taskId = null;
     let targetWord = null;
+    let targetWordPlaceholders = null;
     let rightAnswerId = null;
     let explanation = null;
+    let explanationPlaceholders = null;
     let audioUrl = null;
 
     async function loadWordExplanationGame() {
@@ -62,6 +64,8 @@
         taskId = data.task_id;
         rightAnswerId = data.right_answer_id;
         targetWord = data.target_word;
+        targetWordPlaceholders = data.target_word_placeholder;
+        explanationPlaceholders = replacePlaceholders(data.explanation, data.explanation_placeholder);
         audioUrl = data.audio_url;
     }
     loadWordExplanationGame();
@@ -75,6 +79,8 @@
         updateTaskStatistics([[targetWord, isTrue]]);
         const answerElement = document.getElementById(`button${answer}`);
         const rightAnswerElement = document.getElementById(`button${rightAnswerId}`);
+        rightAnswerElement.innerHTML = replacePlaceholders(rightAnswerElement.textContent, targetWordPlaceholders);
+        document.getElementById('taskPlaceholder').innerHTML = explanationPlaceholders;
 
         rightAnswerElement.classList.remove('button')
         rightAnswerElement.classList.add('buttonRight');

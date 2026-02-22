@@ -79,10 +79,10 @@
 
         const task = await getTaskContent("MatchWordExplanation", isTaskValid);
         data = [
-            {word: task.word1, audio: task.audio1,  explanation: task.explanation1, matched: false},
-            {word: task.word2, audio: task.audio2, explanation: task.explanation2, matched: false},
-            {word: task.word3, audio: task.audio3, explanation: task.explanation3, matched: false},
-            {word: task.word4, audio: task.audio4, explanation: task.explanation4, matched: false}
+            {word: task.word1, audio: task.audio1,  explanation: task.explanation1, placeholder: task.explanation_placeholder1, matched: false},
+            {word: task.word2, audio: task.audio2, explanation: task.explanation2, placeholder: task.explanation_placeholder2, matched: false},
+            {word: task.word3, audio: task.audio3, explanation: task.explanation3, placeholder: task.explanation_placeholder3, matched: false},
+            {word: task.word4, audio: task.audio4, explanation: task.explanation4, placeholder: task.explanation_placeholder4, matched: false}
         ];
         box2word = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
         box2explanation = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
@@ -170,7 +170,7 @@
             explanationBox.style.backgroundColor = 'green';
             data[wordId]["matched"] = true;
             const word = data[wordId].word;
-            data[wordId].explanation = data[wordId].explanation.replace("***", `<b>${word}</b>`);
+            data[wordId].explanation = replacePlaceholders(data[wordId].explanation, data[wordId].placeholder);
 
             selectedWord = null;
             selectedExplanation = null;
