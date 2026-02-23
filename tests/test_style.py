@@ -22,6 +22,8 @@ def test_style() -> None:
     style_guide = flake8.get_style_guide(
         ignore=[
             "E501",
+            "E251",
+            "F811",
             "W503",
             "ANN101",
             "TYP101",

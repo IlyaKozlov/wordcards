@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 import zipfile
 
+
 @pytest.fixture
 def fill_db():
     db_path = Path(__file__).parent.parent / "db"
@@ -11,7 +12,7 @@ def fill_db():
     if db_path_uid.exists():
         shutil.rmtree(db_path_uid)
     os.makedirs(db_path, exist_ok=True)
-    archive_path = Path(__file__).parent/"test.zip"
+    archive_path = Path(__file__).parent / "test.zip"
 
     with zipfile.ZipFile(archive_path, 'r') as zip_ref:
         zip_ref.extractall(db_path)
