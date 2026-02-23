@@ -34,6 +34,6 @@ class Database(abc.ABC):
     @staticmethod
     def save_object(obj: List | Dict, path: Path) -> None:
         tmp_path = path.parent / (path.name + f"_{str(uuid.uuid4())}.tmp")
-        with open(tmp_path, "w") as file:
+        with open(tmp_path, "w", encoding="utf-8") as file:
             json.dump(obj=obj, fp=file, indent=4, ensure_ascii=False)
         shutil.move(tmp_path, path)

@@ -25,7 +25,7 @@ class TaskDB(Database):
         self,
         words: Optional[List[str]] = None,
     ) -> Optional[List[WordExplanation]]:
-        with open(self._path_learning) as file, open(
+        with open(self._path_learning, encoding="utf-8") as file, open(
             self._task_statistic_path
         ) as statistic_file:
             data: dict = json.load(file)
@@ -51,7 +51,7 @@ class TaskDB(Database):
         statistics: WordsStatisticUpdate,
     ) -> None:
         if self._task_statistic_path.exists():
-            with open(self._task_statistic_path) as file:
+            with open(self._task_statistic_path, encoding="utf-8") as file:
                 data: dict = json.load(file)
         else:
             data = {}
@@ -89,7 +89,7 @@ class TaskDB(Database):
 
     def _get_data(self) -> Dict[str, Dict]:
         if self._task_path.exists():
-            data: dict = json.load(open(self._task_path))
+            data: dict = json.load(open(self._task_path, encoding="utf-8"))
             ts_threshold = time.time() - 7 * 24 * 3600
             data = {k: v for k, v in data.items() if v["timestamp"] > ts_threshold}
         else:
@@ -103,8 +103,8 @@ class TaskDB(Database):
     def get_words_statistics(self) -> List[WordStatistic]:
         if not self._task_statistic_path.exists():
             self.save_object({}, self._task_statistic_path)
-        with open(self._task_statistic_path) as statistic_file, open(
-            self._path_learning
+        with open(self._task_statistic_path, encoding="utf-8") as statistic_file, open(
+            self._path_learning, encoding="utf-8"
         ) as words_file:
             statistics: dict = json.load(statistic_file)
             words: dict = json.load(words_file)

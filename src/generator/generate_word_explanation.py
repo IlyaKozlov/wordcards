@@ -17,7 +17,7 @@ class GenerateWordExplanation:
 
     def generate_word_explanation(self, word: str) -> List[WordExplanation]:
         path = Path(__file__).parent / "prompt.txt"
-        template = path.read_text()
+        template = path.read_text(encoding="utf-8")
         prompt = template.replace("WORD", word)
         result = self.model.invoke(prompt)
 

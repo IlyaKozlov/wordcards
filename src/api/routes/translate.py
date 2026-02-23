@@ -16,7 +16,7 @@ def html_form(
 ) -> HTMLResponse:
     path = Path(__file__).parent / "translate_form.html"
     assert path.is_file()
-    with open(path) as file:
+    with open(path, encoding="utf-8") as file:
         html = file.read()
     return HTMLResponse(content=html)
 

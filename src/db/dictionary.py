@@ -14,16 +14,19 @@ class Dictionary:
 
     def get(self, word: str) -> Optional[str]:
         word = self._to_key(word)
-        with open(self.path, "r") as file:
+        if not self.path.is_file():
+            with open(self.path, "w", encoding="utf-8") as file:
+                json.dump(obj={}, fp=file)
+        with open(self.path, "r", encoding="utf-8") as file:
             data = json.load(file)
         return data.get(word.lower())
 
     def put(self, word: str, translation: str) -> None:
         word = self._to_key(word)
-        with open(self.path, "r") as file:
+        with open(self.path, "r", encoding="utf-8") as file:
             data = json.load(file)
         data[word] = translation
-        with open(self.path_tmp, "w") as file:
+        with open(self.path_tmp, "w", encoding="utf-8") as file:
             json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
         shutil.move(self.path_tmp, self.path)
 
