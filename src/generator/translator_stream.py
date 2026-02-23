@@ -74,7 +74,7 @@ class TranslatorStream:
 
     def _translate_en_ru(self, message: str) -> Iterable[Chunk]:
         message = message.strip()
-        with open(self._templates / "translate_en_ru.txt") as f:
+        with open(self._templates / "translate_en_ru.txt", encoding="utf-8") as f:
             template = f.read()
         prompt = template.format(message=message)
         yield from (
@@ -97,7 +97,7 @@ class TranslatorStream:
                     self.counter.put(w, weight=1)
 
     def _translate_ru_en(self, message: str) -> Iterable[Chunk]:
-        with open(self._templates / "translate_ru_en.txt") as f:
+        with open(self._templates / "translate_ru_en.txt", encoding="utf-8") as f:
             template = f.read()
         prompt = template.format(message=message)
         yield from (

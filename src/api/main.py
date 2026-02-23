@@ -40,7 +40,7 @@ app.include_router(db_route, prefix="/backups", tags=["backups"])
 
 @app.get("/")
 def root() -> HTMLResponse:
-    with open(static_path / "main.html") as out:
+    with open(static_path / "main.html", encoding="utf-8") as out:
         code = out.read()
     return HTMLResponse(code)
 

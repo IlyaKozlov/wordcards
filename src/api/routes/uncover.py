@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 @uncover.get("")
 def html_form(uid: str = Query(default=None)) -> HTMLResponse:
     path = Path(__file__).parent / "form.html"
-    with open(path) as file:
+    with open(path, encoding="utf-8") as file:
         code = file.read()
     return HTMLResponse(content=code)
 

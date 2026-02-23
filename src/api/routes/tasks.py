@@ -43,20 +43,20 @@ def update_statistics(
 
 @tasks.get("")
 def task(uid: str = Query(), ) -> HTMLResponse:
-    with open(htmls_path / "task.html", "r") as f:
+    with open(htmls_path / "task.html", "r", encoding="utf-8") as f:
         code = f.read()
     return HTMLResponse(code)
 
 
 @tasks.get("/task_word2explanation")
 def task_word2explanation(uid: str = Query(), ) -> HTMLResponse:
-    with open(htmls_path / "task_word2explanation.html", "r") as f:
+    with open(htmls_path / "task_word2explanation.html", "r", encoding="utf-8") as f:
         code = f.read()
     return HTMLResponse(code)
 
 
 @tasks.get("/task_other")
 def task_other(uid: str = Query(), ) -> HTMLResponse:
-    with open(htmls_path / "task_typing.html", "r") as f:
+    with open(htmls_path / "task_typing.html", "r", encoding="utf-8") as f:
         code = f.read()
     return HTMLResponse(code)
