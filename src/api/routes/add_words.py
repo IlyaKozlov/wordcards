@@ -27,7 +27,7 @@ def add_book(
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
         file_path = tmpdir / file.filename
-        with open(file_path, "wb", encoding="utf-8") as f:
+        with open(file_path, "wb") as f:
             f.write(file.file.read())
         pages = dm.handle(file=file_path)
 
