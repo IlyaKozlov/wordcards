@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 
 
-def test_add_word():
+def test_add_word() -> None:
     params = {"uid": "test"}
     with TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)

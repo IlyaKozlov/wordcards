@@ -6,15 +6,15 @@ from schemas.tasks.word_statistics_update import (
 )
 
 
-def test_task_update():
+def test_task_update() -> None:
     for is_true in [True, False]:
         statistics = [WordStatisticUpdate(word="mouse", is_true=is_true)]
         data = WordsStatisticUpdate(statistics=statistics)
         params = {"uid": "test"}
         response = requests.post(
-        "http://0.0.0.0:2218/tasks/update_statistics",
-        params=params,
-        json=data.model_dump(),
+            "http://0.0.0.0:2218/tasks/update_statistics",
+            params=params,
+            json=data.model_dump(),
         )
         response.raise_for_status()
         assert response.json() == "ok"
