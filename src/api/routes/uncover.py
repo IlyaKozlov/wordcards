@@ -26,11 +26,12 @@ def html_form(uid: str = Query(default=None)) -> HTMLResponse:
 
 @uncover.post("/save_word")
 def save_word(
-    uid: str = Query(default=None),
+    uid: str = Query(),
     word: str = Form(),
     *,
     background_tasks: BackgroundTasks,
 ) -> str:
+    assert uid is not None, "uid is required"
     database = WordDB(uid)
 
     def save() -> None:
