@@ -1,6 +1,7 @@
 import requests
 from tempfile import TemporaryDirectory
 from pathlib import Path
+from utils_for_test import fill_db  # noqa
 
 
 def test_add_word() -> None:
@@ -19,3 +20,12 @@ def test_add_word() -> None:
 
     response.raise_for_status()
     assert response.json() == "Add 8 (8 unique) words"
+
+
+def test_translate_all(fill_db: None) -> None:
+    for params in [{"uid":"test"},{"uid":"test", "min_cnt":"10"}]:
+        response = requests.get("http://localhost:2218/add_words/translate_all",params = params)
+        response.raise_for_status()
+    params = {"min_cnt":"10"}
+    response = requests.get("http://localhost:2218/add_words/translate_all", params=params)
+    assert response.status_code >= 400
