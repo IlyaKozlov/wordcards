@@ -1,4 +1,6 @@
 import requests
+
+from schemas.tasks.uncover_task import UncoverTask
 from utils_for_test import fill_db  # noqa
 
 from schemas.tasks.match_word_explanation import MatchWordExplanation
@@ -26,6 +28,12 @@ def test_task_type(fill_db: None) -> None:
     params = {"uid": "test", "task_type": "MatchWordExplanation"}
     raw_answer = _get_tasks(params)
     MatchWordExplanation.model_validate(raw_answer)
+
+
+def test_uncover_task(fill_db: None) -> None:
+    params = {"uid": "test", "task_type": "UncoverTask"}
+    raw_answer = _get_tasks(params)
+    UncoverTask.model_validate(raw_answer)
 
 
 def test_task_type1(fill_db: None) -> None:
