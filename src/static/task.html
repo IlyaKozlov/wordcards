@@ -35,6 +35,9 @@
             if (taskType === "Word2Explanation") {
                 url = "/static/task_word2explanation.html";
             }
+            else if (taskType === "UncoverTask") {
+                url = "/static/task_uncover.html";
+            }
             else if (taskType === "MatchWordExplanation") {
                 url = "/static/task_match.html";
             } else if (taskType === "SentenceWithPlaceholder") {
@@ -47,7 +50,7 @@
             }
             else {
                 url = "/static/task_match.html"
-                alert(`Unknow task type ${taskType}`);
+                alert(`Unknown task type ${taskType}`);
             }
             url = url + "?uid=" + encodeURIComponent(uid);
             window.location.replace(url);

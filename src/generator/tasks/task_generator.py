@@ -80,6 +80,7 @@ class TaskGenerator:
             random.choice(item.sentences_with_placeholder).replace("PLACEHOLDER", "***")
             for item in items
         ]
+
         return MatchWordExplanation(
             task_id=words.task_id,
             word1=items[0].word,

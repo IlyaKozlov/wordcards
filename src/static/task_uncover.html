@@ -14,12 +14,13 @@
 <div id="uncover-task">
     <h2 id="word">...</h2>
     <h3 id="translation" class="hidden"></h3>
-    <p id="explanation"></p>
 
     <div>
         <button id="saveButton" class="button" onclick="saveAndLearn()">Save and learn</button>
         <button id="skipButton" class="button" onclick="skipWord()">Skip this word</button>
     </div>
+
+    <p id="explanation"></p>
 </div>
 
 <a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
@@ -73,14 +74,47 @@
 
     function saveAndLearn() {
         if (!currentWord) return;
-        alert(`Word ${currentWord} saved and learned!`);
+        let uid = getUid();
+        fetch(`/uncover/save_word?uid=${uid}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `word=${encodeURIComponent(currentWord)}`
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.log('Failed to save the word. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
         updateTaskStatistics([[currentWord, true]]);
         getNewTask();
     }
 
     function skipWord() {
         if (!currentWord) return;
-        alert(`Word ${currentWord} skipped!`);
+        let uid = getUid();
+        fetch(`/uncover/mark_as_known?uid=${uid}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `word=${encodeURIComponent(currentWord)}`
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.log('Failed to mark the word as known. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            console.log('An error occurred while marking the word as known.');
+        });
         // Move to next task
         getNewTask();
     }

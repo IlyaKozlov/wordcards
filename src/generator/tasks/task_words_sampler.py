@@ -2,6 +2,7 @@ import heapq
 import logging
 import random
 import uuid
+from collections import deque
 from typing import Optional, List
 
 from db.task_db import TaskDB
@@ -13,6 +14,8 @@ from schemas.word_with_explanation import WordWithExplanation
 
 
 class TaskWordsSampler:
+
+    _new_word_generated = deque(maxlen=5)
 
     def __init__(self, db: TaskDB, word_db: WordDB) -> None:
         super().__init__()
@@ -86,9 +89,11 @@ class TaskWordsSampler:
         return random.uniform(0, 0.12) > new_words_fraction
 
     def new_word(self) -> WordWithExplanation:
-        words = self.word_db.get_new_words(1, 1)
+        words = self.word_db.get_new_words(1, 50)
+        words.sort(key=lambda word: word in self._new_word_generated)
         if len(words) == 0:
             raise ValueError("No new words")
-        word = words[0]
+        word = random.choice(words)
+        self._new_word_generated.append(word)
         explanation = Translator(None).translate(word, update_cnt=False)
         return WordWithExplanation(word=word, explanation=explanation)
