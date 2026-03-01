@@ -83,7 +83,7 @@ class TaskWordsSampler:
             return True
         new_words_fraction = 0
         for item in statistics:
-            if item.hits <= 2:
+            if item.hits < 2:
                 new_words_fraction += 1
         new_words_fraction /= len(statistics)
         return random.uniform(0, 0.12) > new_words_fraction
