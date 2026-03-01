@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uncover Task</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>Word Uncover</h1>
+<p id="counter"></p>
+
+<div id="uncover-task">
+    <h2 id="word">...</h2>
+    <h3 id="translation" class="hidden"></h3>
+
+    <div>
+        <button id="saveButton" class="button" onclick="saveAndLearn()">Save and learn</button>
+        <button id="skipButton" class="button" onclick="skipWord()">Skip this word</button>
+    </div>
+
+    <p id="explanation"></p>
+</div>
+
+<a href="/" aria-label="Home"><img src="/static/main_rat.png" alt="Home" id="main-rat"></a>
+
+<script src="/static/commonUtils.js"></script>
+<script src="/static/taskCounter.js"></script>
+<script>
+    fetchNewTask();
+
+    let currentWord = null;
+    let explanationPlaceholders = null;
+
+    async function loadUncoverTask() {
+        const data = await getTaskContent("UncoverTask");
+        if (!data) {
+            // If fetching failed, redirect back to task loader
+            getNewTask();
+            return;
+        }
+
+        // The task content may come from sessionStorage or fetched from server
+        const word = data.word;
+        const explanation = data.explanation;
+        const translation = data.translation || null;
+
+        currentWord = word;
+        document.getElementById('word').textContent = word;
+
+        const translationEl = document.getElementById('translation');
+        if (translation) {
+            translationEl.textContent = translation;
+            translationEl.classList.remove('hidden');
+        } else {
+            translationEl.classList.add('hidden');
+        }
+
+        // If explanation contains placeholders, replace them if placeholders were provided
+        explanationPlaceholders = data.explanation_placeholder || null;
+        let explanationHtml = explanation;
+        if (explanationPlaceholders) {
+            explanationHtml = replacePlaceholders(explanation, explanationPlaceholders);
+        }
+        document.getElementById('explanation').innerHTML = explanationHtml;
+    }
+
+    loadUncoverTask();
+
+    function getNewTask() {
+        window.location.replace('/static/task.html');
+    }
+
+    function saveAndLearn() {
+        if (!currentWord) return;
+        let uid = getUid();
+        fetch(`/uncover/save_word?uid=${uid}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `word=${encodeURIComponent(currentWord)}`
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.log('Failed to save the word. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+        updateTaskStatistics([[currentWord, true]]);
+        getNewTask();
+    }
+
+    function skipWord() {
+        if (!currentWord) return;
+        let uid = getUid();
+        fetch(`/uncover/mark_as_known?uid=${uid}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `word=${encodeURIComponent(currentWord)}`
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.log('Failed to mark the word as known. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            console.log('An error occurred while marking the word as known.');
+        });
+        // Move to next task
+        getNewTask();
+    }
+
+    // Keyboard shortcuts: 's' or Russian 'ы' to save, 'k' or Russian 'л' to skip
+    function keyHandler(e) {
+        if (e.key === 's' || e.key === 'ы') {
+            saveAndLearn();
+        } else if (e.key === 'k' || e.key === 'л') {
+            skipWord();
+        }
+    }
+
+    document.addEventListener('keydown', keyHandler);
+</script>
+
+</body>
+</html>

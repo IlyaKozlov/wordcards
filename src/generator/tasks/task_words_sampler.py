@@ -2,18 +2,25 @@ import heapq
 import logging
 import random
 import uuid
+from collections import deque
 from typing import Optional, List
 
 from db.task_db import TaskDB
+from db.word_db import WordDB
 from generator.tasks.task_words import TaskWords
+from generator.translator import Translator
 from schemas.word_statistic import WordStatistic
+from schemas.word_with_explanation import WordWithExplanation
 
 
 class TaskWordsSampler:
 
-    def __init__(self, db: TaskDB) -> None:
+    _new_word_generated = deque(maxlen=5)
+
+    def __init__(self, db: TaskDB, word_db: WordDB) -> None:
         super().__init__()
         self.db = db
+        self.word_db = word_db
         self._weight = 5
         self.logger = logging.getLogger(__name__)
 
@@ -67,3 +74,26 @@ class TaskWordsSampler:
 
     def _calculate_weight(self, item: WordStatistic) -> float:
         return (item.misses + self._weight) / (item.hits + self._weight)
+
+    def need_new_word(self) -> bool:
+        if not self.word_db.get_new_words(1):
+            return False
+        statistics = self.db.get_words_statistics()
+        if len(statistics) < 10:
+            return True
+        new_words_fraction = 0
+        for item in statistics:
+            if item.hits <= 2:
+                new_words_fraction += 1
+        new_words_fraction /= len(statistics)
+        return random.uniform(0, 0.12) > new_words_fraction
+
+    def new_word(self) -> WordWithExplanation:
+        words = self.word_db.get_new_words(1, 50)
+        words.sort(key=lambda word: word in self._new_word_generated)
+        if len(words) == 0:
+            raise ValueError("No new words")
+        word = random.choice(words)
+        self._new_word_generated.append(word)
+        explanation = Translator(None).translate(word, update_cnt=False)
+        return WordWithExplanation(word=word, explanation=explanation)

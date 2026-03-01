@@ -8,7 +8,7 @@ from schemas.word_explanation import WordExplanation
 
 class WordDB(Database):
 
-    def get_new_words(self, min_cnt: int = 10) -> List[str]:
+    def get_new_words(self, min_cnt: int = 10, max_words: int = 10) -> List[str]:
         with open(self._path_learning, encoding="utf-8") as f1, open(self._path_known, encoding="utf-8") as f2:
             existing_words = set(json.load(f1).keys()) | set(json.load(f2))
         with open(self._path_all_words, encoding="utf-8") as f:
@@ -22,7 +22,7 @@ class WordDB(Database):
             ]
             words_cnt.sort(key=lambda x: x[1], reverse=True)
             words = [w for w, _ in words_cnt]
-        return words
+        return words[: max_words]
 
     def save_know_word(self, word: str) -> None:
         with open(self._path_known, encoding="utf-8") as file:

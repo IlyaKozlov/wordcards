@@ -22,7 +22,17 @@ class WordExplanation(BaseModel):
 
     @property
     def sentences_with_placeholder(self) -> List[str]:
-        return [self._replace_underscore(_, "PLACEHOLDER") for _ in self.sentences]
+        result = []
+        for sentence in self.sentences:
+            replacement = "PLACEHOLDER"
+            sentence_with_placeholder = self._replace_underscore(
+                sentence,
+                replacement,
+            )
+            if replacement not in sentence_with_placeholder:
+                sentence_with_placeholder += f" ({self.word})"
+            result.append(sentence_with_placeholder)
+        return result
 
     @property
     def word_part(self) -> str:
@@ -40,8 +50,11 @@ class WordExplanation(BaseModel):
 
     @property
     def placeholders(self) -> List[str]:
-        return [
+        result = [
             match[1:-1]
             for match in re.findall(_placeholder_regexp, self.explanation)
             if len(match) > 2
         ]
+        if len(result) == 0:
+            return [self.word]
+        return result

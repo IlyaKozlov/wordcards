@@ -4,21 +4,26 @@ from http.client import HTTPException
 from typing import Optional
 
 from db.task_db import TaskDB
+from db.word_db import WordDB
 from generator.tasks.task_words import TaskWords
 from generator.tasks.task_words_sampler import TaskWordsSampler
 from schemas.tasks.match_word2audio import MatchWordAudio
 from schemas.tasks.match_word_explanation import MatchWordExplanation
 from schemas.tasks.no_new_words import NoNewWords
 from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
+from schemas.tasks.task_type import TaskType
+from schemas.tasks.uncover_task import UncoverTask
 from schemas.tasks.word2explanation import Word2Explanation
 from schemas.word_explanation import WordExplanation
+from schemas.word_with_explanation import WordWithExplanation
 
 
 class TaskGenerator:
 
     def __init__(self, user_id: str) -> None:
         self.db = TaskDB(user_id)
-        self.word_sampler = TaskWordsSampler(self.db)
+        self.word_db = WordDB(user_id)
+        self.word_sampler = TaskWordsSampler(self.db, self.word_db)
         self.logger = logging.getLogger(__name__)
         self._tasks_generators = {
             "Word2Explanation": [
@@ -38,11 +43,20 @@ class TaskGenerator:
     def new_task(
         self,
         task_type: Optional[str] = None,
-    ) -> Word2Explanation | SentenceWithPlaceholder | NoNewWords:
+    ) -> TaskType:
+        uncover_task = (
+            task_type == "UncoverTask"
+            or task_type is None
+            and self.word_sampler.need_new_word()
+        )
+        if uncover_task:
+            self.logger.info("Generated task uncover")
+            word2explanation = self.word_sampler.new_word()
+            return self._uncover_task(word2explanation)
         words = self.word_sampler.four_words()
         if words is None:
             return NoNewWords()
-        if task_type is not None:
+        if task_type is not None and task_type.strip():
             generators = self._tasks_generators.get(task_type)
         elif min(word.hits for word in words.words) < 2:
             generators = [
@@ -66,6 +80,7 @@ class TaskGenerator:
             random.choice(item.sentences_with_placeholder).replace("PLACEHOLDER", "***")
             for item in items
         ]
+
         return MatchWordExplanation(
             task_id=words.task_id,
             word1=items[0].word,
@@ -84,6 +99,13 @@ class TaskGenerator:
             audio4=items[3].audio,
             explanation4=sentences[3],
             explanation_placeholder4=items[3].placeholders,
+        )
+
+    def _uncover_task(self, word_with_explanation: WordWithExplanation) -> UncoverTask:
+        self.logger.info("Generated task uncover")
+        return UncoverTask(
+            word=word_with_explanation.word,
+            explanation=word_with_explanation.explanation,
         )
 
     def _match_word2translation(self, words: TaskWords) -> MatchWordExplanation:
