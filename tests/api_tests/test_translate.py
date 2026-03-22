@@ -1,12 +1,16 @@
 import requests
+import pytest
+from utils_for_test import service_running
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_translate() -> None:
     url = "http://localhost:2218/translate?uid=test"
     response = requests.get(url)
     assert response.status_code == 200
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_translate_word() -> None:
     url = "http://localhost:2218/translate/translate"
     data = {"word": "friends"}

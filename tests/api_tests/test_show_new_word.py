@@ -1,7 +1,9 @@
 import requests
-from utils_for_test import fill_db  # noqa
+from utils_for_test import fill_db, service_running  # noqa
+import pytest
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_show_new_words(fill_db):  # noqa
     params = {"uid": "test"}
     response = requests.get("http://localhost:2218/uncover/show_new_word", params= params)
