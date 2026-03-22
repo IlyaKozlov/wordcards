@@ -86,7 +86,7 @@ class TaskWordsSampler:
             if item.hits < 2:
                 new_words_fraction += 1
         new_words_fraction /= len(statistics)
-        return random.uniform(0, 0.12) > new_words_fraction
+        return random.uniform(0, 0.10) > new_words_fraction
 
     def new_word(self) -> WordWithExplanation:
         words = self.word_db.get_new_words(1, 50)

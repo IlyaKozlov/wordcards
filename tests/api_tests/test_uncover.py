@@ -1,13 +1,16 @@
 import requests
-from utils_for_test import fill_db  # noqa
+import pytest
+from utils_for_test import fill_db, service_running  # noqa
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_unc_with_db(fill_db: None) -> None:
     params = {"uid": "test"}
     response = requests.get("http://localhost:2218/uncover", params=params)
     response.raise_for_status()
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_unc_without_db() -> None:
     params = {"uid": "test"}
     response = requests.get("http://localhost:2218/uncover", params=params)

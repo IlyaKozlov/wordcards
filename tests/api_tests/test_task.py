@@ -1,7 +1,8 @@
 import requests
+import pytest
 
 from schemas.tasks.uncover_task import UncoverTask
-from utils_for_test import fill_db  # noqa
+from utils_for_test import fill_db, service_running  # noqa
 
 from schemas.tasks.match_word_explanation import MatchWordExplanation
 from schemas.tasks.sentence_with_placeholder import SentenceWithPlaceholder
@@ -10,6 +11,7 @@ from schemas.tasks.word2explanation import Word2Explanation
 base_url = "http://localhost:2218"
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_filldb() -> None:
     for word in ["one", "two", "three", "four", "five"]:
         data = {"word": word}
@@ -19,29 +21,34 @@ def test_filldb() -> None:
         response.raise_for_status()
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_tasks(fill_db: None) -> None:
     params = {"uid": "test"}
     _get_tasks(params)
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_task_type(fill_db: None) -> None:
     params = {"uid": "test", "task_type": "MatchWordExplanation"}
     raw_answer = _get_tasks(params)
     MatchWordExplanation.model_validate(raw_answer)
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_uncover_task(fill_db: None) -> None:
     params = {"uid": "test", "task_type": "UncoverTask"}
     raw_answer = _get_tasks(params)
     UncoverTask.model_validate(raw_answer)
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_task_type1(fill_db: None) -> None:
     params = {"uid": "test", "task_type": "SentenceWithPlaceholder"}
     raw_answer = _get_tasks(params)
     SentenceWithPlaceholder.model_validate(raw_answer)
 
 
+@pytest.mark.skipif(not service_running(), reason="service not running")
 def test_task_type2(fill_db: None) -> None:
     params = {"uid": "test", "task_type": "Word2Explanation"}
     raw_answer = _get_tasks(params)

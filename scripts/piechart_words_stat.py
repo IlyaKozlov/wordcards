@@ -12,6 +12,8 @@ labels = sorted(cnt)
 values = [cnt[k] for k in labels]
 labels_upd = [f"{k}: ({cnt[k]} {int(cnt[k] / sum(values) * 100)}%)" for k in labels]
 
+word_num = sum(1 for _ in db.get_words_statistics())
+plt.title(f"{word_num} words")
 plt.pie(x=values, labels=labels_upd)
 plt.show()
 

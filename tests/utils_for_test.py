@@ -3,6 +3,8 @@ import shutil
 from pathlib import Path
 import pytest
 import zipfile
+from requests.exceptions import ConnectionError
+import requests
 
 
 @pytest.fixture
@@ -14,12 +16,21 @@ def fill_db() -> None:
     os.makedirs(db_path, exist_ok=True)
     archive_path = Path(__file__).parent / "test.zip"
 
-    with zipfile.ZipFile(archive_path, 'r') as zip_ref:
+    with zipfile.ZipFile(archive_path, "r") as zip_ref:
         zip_ref.extractall(db_path)
     yield
     if db_path_uid.exists():
         shutil.rmtree(db_path_uid)
 
 
-if __name__ == '__main__':
-    fill_db()
+def service_running() -> bool:
+    try:
+        response = requests.get("http://localhost:2218", timeout=1)
+    except ConnectionError:
+        return False
+    return response.status_code == 200
+
+
+if __name__ == "__main__":
+    # fill_db()
+    service_running()
